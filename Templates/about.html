@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About Us — GV School</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary   : #4f46e5;
+      --primary-d : #3730a3;
+      --accent    : #06b6d4;
+      --gold      : #d97706;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; color: #1e293b; overflow-x: hidden; }
+
+    /* ── Navbar ── */
+    .navbar {
+      background: linear-gradient(135deg, #1e1b4b, #4f46e5);
+      padding: 1rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 999;
+      box-shadow: 0 2px 20px rgba(0,0,0,.3);
+    }
+    .navbar .brand {
+      color: #fff; font-weight: 800; font-size: 1.3rem;
+      text-decoration: none; display: flex; align-items: center; gap: .6rem;
+    }
+    .navbar .brand .logo-circle {
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,.15); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+    }
+    .nav-links { display: flex; gap: .5rem; align-items: center; }
+    .nav-links a {
+      color: rgba(255,255,255,.85); text-decoration: none;
+      padding: .45rem 1rem; border-radius: 8px;
+      font-size: .9rem; font-weight: 500; transition: .2s;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      background: rgba(255,255,255,.18); color: #fff;
+    }
+    .nav-links .btn-portal {
+      background: rgba(255,255,255,.2);
+      border: 1px solid rgba(255,255,255,.4);
+      color: #fff; padding: .45rem 1.1rem;
+      border-radius: 8px; font-weight: 600;
+    }
+    .nav-links .btn-portal:hover { background: rgba(255,255,255,.35); }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #1e1b4b 0%, #4f46e5 60%, #06b6d4 100%);
+      color: #fff; padding: 5rem 2rem 4rem;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,.04) 0%, transparent 60%);
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800; margin-bottom: 1rem;
+      text-shadow: 0 2px 20px rgba(0,0,0,.3);
+    }
+    .hero p {
+      font-size: 1.15rem; opacity: .88;
+      max-width: 600px; margin: 0 auto 2rem;
+      line-height: 1.7;
+    }
+    .hero-badges {
+      display: flex; justify-content: center;
+      gap: 1rem; flex-wrap: wrap;
+    }
+    .hero-badge {
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 30px; padding: .4rem 1.2rem;
+      font-size: .85rem; font-weight: 600;
+      display: flex; align-items: center; gap: .4rem;
+    }
+
+    /* ── Sections ── */
+    section { padding: 5rem 0; }
+    section:nth-child(even) { background: #f8faff; }
+    .section-label {
+      font-size: .75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 2px;
+      color: var(--primary); margin-bottom: .5rem;
+    }
+    .section-title {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800; margin-bottom: 1rem; color: #1e1b4b;
+    }
+    .section-sub {
+      color: #64748b; font-size: 1rem;
+      line-height: 1.7; max-width: 560px;
+    }
+
+    /* ── Stats ── */
+    .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    .stat-item {
+      background: linear-gradient(135deg, #4f46e5, #3730a3);
+      color: #fff; border-radius: 14px; padding: 1.5rem;
+      text-align: center;
+    }
+    .stat-item .num {
+      font-size: 2.4rem; font-weight: 800; line-height: 1;
+    }
+    .stat-item .lbl { font-size: .82rem; opacity: .85; margin-top: .3rem; }
+
+    /* ── Mission Cards ── */
+    .mission-card {
+      background: #fff; border-radius: 16px;
+      padding: 2rem; height: 100%;
+      box-shadow: 0 2px 20px rgba(0,0,0,.06);
+      border-top: 4px solid var(--primary);
+      transition: .3s;
+    }
+    .mission-card:hover { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(79,70,229,.15); }
+    .mission-card .icon {
+      width: 56px; height: 56px;
+      background: #ede9fe; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary);
+    }
+    .mission-card h5 { font-weight: 700; margin-bottom: .5rem; color: #1e1b4b; }
+    .mission-card p  { color: #64748b; font-size: .92rem; line-height: 1.6; }
+
+    /* ── Team ── */
+    .team-card {
+      background: #fff; border-radius: 16px;
+      padding: 2rem; text-align: center;
+      box-shadow: 0 2px 16px rgba(0,0,0,.06); transition: .3s;
+    }
+    .team-card:hover { transform: translateY(-4px); }
+    .team-avatar {
+      width: 80px; height: 80px; border-radius: 50%;
+      margin: 0 auto 1rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; font-weight: 800; color: #fff;
+    }
+    .team-card h6 { font-weight: 700; margin-bottom: .2rem; }
+    .team-card small { color: #64748b; }
+
+    /* ── Timeline ── */
+    .timeline { position: relative; padding-left: 2rem; }
+    .timeline::before {
+      content: ''; position: absolute;
+      left: 8px; top: 0; bottom: 0;
+      width: 2px; background: linear-gradient(#4f46e5, #06b6d4);
+    }
+    .tl-item { position: relative; margin-bottom: 2rem; }
+    .tl-dot {
+      position: absolute; left: -2rem; top: .3rem;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--primary); border: 3px solid #fff;
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+    .tl-year {
+      font-size: .75rem; font-weight: 700;
+      color: var(--primary); margin-bottom: .2rem;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .tl-item h6 { font-weight: 700; margin-bottom: .2rem; }
+    .tl-item p  { color: #64748b; font-size: .9rem; }
+
+    /* ── Values ── */
+    .value-pill {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: #ede9fe; color: var(--primary);
+      border-radius: 30px; padding: .5rem 1.2rem;
+      font-size: .88rem; font-weight: 600; margin: .3rem;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      background: linear-gradient(135deg, #1e1b4b, #4f46e5);
+      color: #fff; padding: 5rem 2rem; text-align: center;
+    }
+    .cta-section h2 { font-size: 2rem; font-weight: 800; margin-bottom: 1rem; }
+    .cta-section p  { opacity: .85; margin-bottom: 2rem; font-size: 1.05rem; }
+    .btn-cta {
+      padding: .85rem 2.5rem; border-radius: 12px;
+      font-weight: 700; font-size: 1rem;
+      text-decoration: none; transition: .2s; display: inline-flex;
+      align-items: center; gap: .5rem;
+    }
+    .btn-cta.white {
+      background: #fff; color: var(--primary);
+    }
+    .btn-cta.white:hover { background: #f0f0ff; }
+    .btn-cta.outline {
+      border: 2px solid rgba(255,255,255,.5); color: #fff;
+    }
+    .btn-cta.outline:hover { background: rgba(255,255,255,.12); }
+
+    /* ── Footer ── */
+    footer {
+      background: #0f172a; color: rgba(255,255,255,.7);
+      padding: 1.5rem 2rem; text-align: center; font-size: .85rem;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .nav-links .hide-mobile { display: none; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      section { padding: 3rem 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav class="navbar">
+  <a class="brand" href="#">
+    <div class="logo-circle"><i class="bi bi-mortarboard-fill"></i></div>
+    GV School
+  </a>
+  <div class="nav-links">
+    <a href="#" class="hide-mobile">Home</a>
+    <a href="{% url 'AboutUs' %}" class="active hide-mobile">About</a>
+    <a href="{% url 'ContactUs' %}" class="hide-mobile">Contact</a>
+    <a href="{% url 'Auth' %}" class="btn-portal">
+      <i class="bi bi-shield-lock me-1"></i>Admin
+    </a>
+    <a href="{% url 'Log' %}" class="btn-portal ms-1">
+      <i class="bi bi-person me-1"></i>Student
+    </a>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="container">
+    <p class="section-label" style="color:rgba(255,255,255,.6)">
+      Established 2005
+    </p>
+    <h1>Shaping Minds,<br>Building Futures</h1>
+    <p>
+      GV School has been a center of academic excellence for over two decades,
+      nurturing students with quality education, strong values, and modern learning.
+    </p>
+    <div class="hero-badges">
+      <span class="hero-badge"><i class="bi bi-award"></i> Accredited Institution</span>
+      <span class="hero-badge"><i class="bi bi-people"></i> 1200+ Students</span>
+      <span class="hero-badge"><i class="bi bi-geo-alt"></i> Lahore, Pakistan</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── About + Stats ── -->
+<section>
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <p class="section-label">Who We Are</p>
+        <h2 class="section-title">A Legacy of Education Since 2005</h2>
+        <p class="section-sub mb-3">
+          GV School was founded with a single mission — to provide every child
+          with access to quality education in a safe, supportive, and modern
+          learning environment.
+        </p>
+        <p class="section-sub mb-4">
+          Over the years, we have grown from a small institution to one of the
+          most trusted schools in the region, with hundreds of alumni making
+          their mark in universities and careers across Pakistan and abroad.
+        </p>
+        <a href="{% url 'ContactUs' %}" class="btn btn-primary px-4 py-2"
+           style="border-radius:10px;background:linear-gradient(135deg,#4f46e5,#3730a3);border:none;font-weight:600">
+          <i class="bi bi-envelope me-2"></i>Get In Touch
+        </a>
+      </div>
+      <div class="col-lg-6">
+        <div class="stat-grid">
+          <div class="stat-item">
+            <div class="num">20+</div>
+            <div class="lbl">Years of Excellence</div>
+          </div>
+          <div class="stat-item" style="background:linear-gradient(135deg,#0891b2,#06b6d4)">
+            <div class="num">1,200+</div>
+            <div class="lbl">Students Enrolled</div>
+          </div>
+          <div class="stat-item" style="background:linear-gradient(135deg,#059669,#047857)">
+            <div class="num">60+</div>
+            <div class="lbl">Qualified Teachers</div>
+          </div>
+          <div class="stat-item" style="background:linear-gradient(135deg,#d97706,#b45309)">
+            <div class="num">98%</div>
+            <div class="lbl">Pass Rate</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Mission / Vision / Values ── -->
+<section>
+  <div class="container">
+    <div class="text-center mb-5">
+      <p class="section-label">Our Purpose</p>
+      <h2 class="section-title">Mission, Vision & Values</h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="mission-card">
+          <div class="icon"><i class="bi bi-bullseye"></i></div>
+          <h5>Our Mission</h5>
+          <p>
+            To deliver high-quality, inclusive education that empowers every
+            student to reach their full academic and personal potential — regardless
+            of background or circumstance.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mission-card" style="border-top-color:#06b6d4">
+          <div class="icon" style="background:#e0f7fa;color:#0891b2">
+            <i class="bi bi-eye"></i>
+          </div>
+          <h5>Our Vision</h5>
+          <p>
+            To be recognized as a leading center of learning where students
+            graduate as confident, ethical, and globally aware citizens ready
+            to contribute to society.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mission-card" style="border-top-color:#d97706">
+          <div class="icon" style="background:#fef3c7;color:#d97706">
+            <i class="bi bi-heart"></i>
+          </div>
+          <h5>Our Values</h5>
+          <div class="mt-2">
+            <span class="value-pill"><i class="bi bi-check2"></i> Integrity</span>
+            <span class="value-pill"><i class="bi bi-check2"></i> Excellence</span>
+            <span class="value-pill"><i class="bi bi-check2"></i> Respect</span>
+            <span class="value-pill"><i class="bi bi-check2"></i> Discipline</span>
+            <span class="value-pill"><i class="bi bi-check2"></i> Innovation</span>
+            <span class="value-pill"><i class="bi bi-check2"></i> Inclusivity</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Our Journey (Timeline) ── -->
+<section>
+  <div class="container">
+    <div class="row g-5 align-items-start">
+      <div class="col-lg-5">
+        <p class="section-label">Our Story</p>
+        <h2 class="section-title">Two Decades of Growth</h2>
+        <p class="section-sub">
+          From a small school with a handful of classrooms to a full-fledged
+          institution with modern facilities — our journey has been one of
+          constant progress and dedication.
+        </p>
+      </div>
+      <div class="col-lg-7">
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-year">2005</div>
+            <h6>Founded</h6>
+            <p>GV School was established with 3 classrooms, 12 teachers, and 120 students.</p>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:#06b6d4;box-shadow:0 0 0 2px #06b6d4"></div>
+            <div class="tl-year" style="color:#06b6d4">2010</div>
+            <h6>Secondary Wing Added</h6>
+            <p>Expanded to include Classes VII–X with a dedicated science lab and library.</p>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:#d97706;box-shadow:0 0 0 2px #d97706"></div>
+            <div class="tl-year" style="color:#d97706">2015</div>
+            <h6>Digital Classrooms</h6>
+            <p>Introduced smart boards and computer labs. Student count crossed 800.</p>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:#059669;box-shadow:0 0 0 2px #059669"></div>
+            <div class="tl-year" style="color:#059669">2020</div>
+            <h6>Online Learning During COVID</h6>
+            <p>Seamlessly shifted to online classes with zero interruption to academic year.</p>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-year">2024</div>
+            <h6>Digital Management System</h6>
+            <p>Launched GV School Management System — full digitization of admin, teachers, and students.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Leadership Team ── -->
+<section>
+  <div class="container">
+    <div class="text-center mb-5">
+      <p class="section-label">The People Behind GV</p>
+      <h2 class="section-title">Our Leadership Team</h2>
+    </div>
+    <div class="row g-4 justify-content-center">
+      <div class="col-6 col-md-3">
+        <div class="team-card">
+          <div class="team-avatar"
+               style="background:linear-gradient(135deg,#4f46e5,#3730a3)">A</div>
+          <h6>Mr. Ahmad Raza</h6>
+          <small>Principal</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="team-card">
+          <div class="team-avatar"
+               style="background:linear-gradient(135deg,#0891b2,#06b6d4)">S</div>
+          <h6>Mrs. Sara Khan</h6>
+          <small>Vice Principal</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="team-card">
+          <div class="team-avatar"
+               style="background:linear-gradient(135deg,#059669,#047857)">M</div>
+          <h6>Mr. Muhammad Ali</h6>
+          <small>Head of Academics</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="team-card">
+          <div class="team-avatar"
+               style="background:linear-gradient(135deg,#d97706,#b45309)">F</div>
+          <h6>Ms. Fatima Malik</h6>
+          <small>Admin Coordinator</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<div class="cta-section">
+  <div class="container">
+    <h2>Ready to Join GV School?</h2>
+    <p>Have questions about admissions, facilities, or our programs?<br>
+       We are always happy to hear from you.</p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="{% url 'ContactUs' %}" class="btn-cta white">
+        <i class="bi bi-envelope-fill"></i> Contact Us
+      </a>
+      <a href="{% url 'Log' %}" class="btn-cta outline">
+        <i class="bi bi-person-circle"></i> Student Portal
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ── Footer ── -->
+<footer>
+  <p>© 2024 GV School — All Rights Reserved &nbsp;|&nbsp;
+     Lahore, Pakistan &nbsp;|&nbsp;
+     <a href="{% url 'ContactUs' %}" style="color:rgba(255,255,255,.6)">Contact Us</a>
+  </p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

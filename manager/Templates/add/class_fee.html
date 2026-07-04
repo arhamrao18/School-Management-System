@@ -1,0 +1,99 @@
+{% extends 'add/base.html' %}
+{% block title %}Class Fee{% endblock %}
+{% block breadcrumb %}Class Fee Management{% endblock %}
+{% block content %}
+<!-- Filter -->
+<form method="GET" class="row g-2 mb-4">
+  <div class="col-md-3">
+    <select name="month" class="form-select" onchange="this.form.submit()">
+      {% for num, name in months %}
+      <option value="{{ num }}" {% if sel_month == num %}selected{% endif %}>
+        {{ name }}
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select name="year" class="form-select" onchange="this.form.submit()">
+      {% for y in years %}
+      <option value="{{ y }}" {% if sel_year == y %}selected{% endif %}>{{ y }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</form>
+
+<!-- Fee Form -->
+<form method="POST">
+  {% csrf_token %}
+  <!-- Selected month/year hidden fields -->
+  <input type="hidden" name="sel_month" value="{{ sel_month }}">
+  <input type="hidden" name="sel_year"  value="{{ sel_year }}">
+  ...
+</form>
+<div class="card">
+  <div class="card-header text-white" style="background:linear-gradient(135deg,#059669,#047857)">
+    <i class="bi bi-receipt me-2"></i>Class Fee Management
+  </div>
+  <div class="card-body">
+    <div class="alert alert-info mb-4">
+      <i class="bi bi-info-circle me-2"></i>
+      Here set <strong>monthly fee, due date and late fine</strong> of every class.
+      Students can see and download fee voucher through portal.
+    </div>
+    <form method="POST">
+      {% csrf_token %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead style="background:#059669;color:#fff">
+            <tr>
+              <th>Class</th>
+              <th>Monthly Fee (Rs.)</th>
+              <th>Due Date (Every month)</th>
+              <th>Late Fine (Rs.)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in grade_fees %}
+            <tr>
+              <td class="fw-semibold">{{ item.grade }}</td>
+              <td>
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text">Rs.</span>
+                  <input type="number" name="fee_{{ item.grade.id }}" class="form-control"
+                         value="{{ item.fee.monthly_fee|default:'' }}" placeholder="0" min="0" step="50">
+                </div>
+              </td>
+              <td>
+                <div class="input-group input-group-sm">
+                  <input type="number" name="due_{{ item.grade.id }}" class="form-control"
+                         value="{{ item.fee.due_date|default:'10' }}" min="1" max="31">
+                  <span class="input-group-text">Date</span>
+                </div>
+              </td>
+              <td>
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text">Rs.</span>
+                  <input type="number" name="fine_{{ item.grade.id }}" class="form-control"
+                         value="{{ item.fee.late_fine|default:'0' }}" placeholder="0" min="0">
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center text-muted py-3">
+              Firstly <a href="{% url 'Adding' %}">add classes</a>.
+            </td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% if grade_fees %}
+      <div class="text-end mt-3">
+        <button type="submit" class="btn btn-success btn-lg px-5">
+          <i class="bi bi-save me-2"></i>Save Fee's
+        </button>
+      </div>
+      {% endif %}
+    </form>
+  </div>
+</div>
+{% endblock %}

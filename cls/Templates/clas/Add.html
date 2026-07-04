@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>School Management</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body { background: linear-gradient(135deg,#667eea,#764ba2); min-height:100vh; }
+.card { border-radius:15px; box-shadow:0 10px 25px rgba(0,0,0,.2); }
+.btn-custom { background:#667eea; color:white; }
+</style>
+</head>
+<body>
+<div class="container py-4">
+<div class="row justify-content-center">
+<div class="col-md-7">
+<div class="card p-4">
+<h3 class="mb-3 text-center">📘 School Management</h3>
+
+{% if messages %}
+{% for msg in messages %}
+<div class="alert alert-{{ msg.tags }} alert-dismissible fade show">{{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+{% endfor %}
+{% endif %}
+
+<div class="d-flex gap-2 mb-3 flex-wrap">
+  <button class="btn btn-custom" onclick="show('classForm')">➕ Add Class</button>
+  <button class="btn btn-success" onclick="show('sectionForm')">🏷️ Add Section</button>
+  <button class="btn btn-warning" onclick="show('subjectForm')">📚 Add Subject</button>
+</div>
+
+<!-- CLASS FORM -->
+<form method="POST" id="classForm" style="display:none" class="border p-3 rounded mb-3">
+  {% csrf_token %}<input type="hidden" name="form_type" value="grade">
+  <h6>Add Class</h6>
+  <input type="text" name="grade" class="form-control mb-2" placeholder="Class name e.g. Class I" required>
+  <button type="submit" class="btn btn-success w-100">Save Class</button>
+</form>
+
+<!-- SECTION FORM -->
+<form method="POST" id="sectionForm" style="display:none" class="border p-3 rounded mb-3">
+  {% csrf_token %}<input type="hidden" name="form_type" value="section">
+  <h6>Add Section</h6>
+  <select name="grade_id" class="form-control mb-2" required>
+    <option value="" disabled selected>Select a class</option>
+    {% for c in Grades %}<option value="{{ c.id }}">{{ c.grade }}</option>{% endfor %}
+  </select>
+  <input type="text" name="section_name" class="form-control mb-2" placeholder="Section name e.g. A, Red, Morning" required>
+  <button type="submit" class="btn btn-success w-100">Save Section</button>
+</form>
+
+<!-- SUBJECT FORM -->
+<form method="POST" id="subjectForm" style="display:none" class="border p-3 rounded mb-3">
+  {% csrf_token %}<input type="hidden" name="form_type" value="subject">
+  <h6>Add Subject</h6>
+  <input type="text" name="subject" class="form-control mb-2" placeholder="Subject name" required>
+  <small class="text-muted">Hold Ctrl to select multiple classes</small>
+  <select name="classess" multiple class="form-control mb-2" size="5">
+    {% for c in Grades %}<option value="{{ c.id }}">{{ c.grade }}</option>{% endfor %}
+  </select>
+  <button type="submit" class="btn btn-dark w-100">Save Subject</button>
+</form>
+
+<!-- CLASSES TABLE -->
+<h6 class="mt-3">Classes & Sections</h6>
+<table class="table table-bordered table-sm">
+  <thead class="table-dark"><tr><th>Class</th><th>Sections</th></tr></thead>
+  <tbody>
+  {% for g in Grades %}
+  <tr>
+    <td>{{ g.grade }}</td>
+    <td>
+      {% for sec in g.section_set.all %}
+        <span class="badge bg-primary">{{ sec.section }} ({{ sec.student_count }} students)</span>
+      {% empty %} <span class="text-muted">No sections yet</span>
+      {% endfor %}
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<!-- SUBJECTS TABLE -->
+{% if Subjects %}
+<h6 class="mt-3">Subjects</h6>
+<table class="table table-bordered table-sm">
+  <thead class="table-dark"><tr><th>Subject</th><th>Classes</th></tr></thead>
+  <tbody>
+  {% for sub in Subjects %}
+  <tr>
+    <td>{{ sub.S }}</td>
+    <td>{% for g in sub.grade.all %}<span class="badge bg-secondary">{{ g.grade }}</span> {% endfor %}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+</div></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function show(id){
+  ['classForm','sectionForm','subjectForm'].forEach(f=>document.getElementById(f).style.display='none');
+  document.getElementById(id).style.display='block';
+}
+</script>
+</body></html>

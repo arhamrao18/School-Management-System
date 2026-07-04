@@ -1,0 +1,314 @@
+{% extends 'add/base.html' %}
+{% block title %}Fee Payment Status{% endblock %}
+{% block breadcrumb %}Fee Payment Status{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+
+  <!-- Summary Cards -->
+  <div class="col-md-4">
+    <div class="p-3 rounded-3 text-white d-flex align-items-center gap-3"
+         style="background:linear-gradient(135deg,#059669,#047857)">
+      <i class="bi bi-check-circle-fill" style="font-size:2rem;opacity:.85"></i>
+      <div>
+        <div style="font-size:1.7rem;font-weight:700;line-height:1">{{ paid_count }}</div>
+        <div style="font-size:.82rem;opacity:.9">Paid Students</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="p-3 rounded-3 text-white d-flex align-items-center gap-3"
+         style="background:linear-gradient(135deg,#dc2626,#b91c1c)">
+      <i class="bi bi-clock-fill" style="font-size:2rem;opacity:.85"></i>
+      <div>
+        <div style="font-size:1.7rem;font-weight:700;line-height:1">{{ pending_count }}</div>
+        <div style="font-size:.82rem;opacity:.9">Pending Students</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="p-3 rounded-3 text-white d-flex align-items-center gap-3"
+         style="background:linear-gradient(135deg,#4f46e5,#3730a3)">
+      <i class="bi bi-cash-stack" style="font-size:2rem;opacity:.85"></i>
+      <div>
+        <div style="font-size:1.7rem;font-weight:700;line-height:1">Rs. {{ total_amount }}</div>
+        <div style="font-size:.82rem;opacity:.9">Total Collected</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Card -->
+<div class="card mb-4">
+  <div class="card-header fw-semibold" style="background:#1e1b4b;color:#fff;border-radius:14px 14px 0 0">
+    <i class="bi bi-funnel me-2"></i>Filter Students
+  </div>
+  <div class="card-body p-3">
+    <form method="GET" class="row g-2 align-items-end">
+
+      <!-- Month -->
+      <div class="col-6 col-md-2">
+        <label class="form-label fw-semibold" style="font-size:.78rem;text-transform:uppercase;color:#64748b">Month</label>
+        <select name="month" class="form-select form-select-sm">
+          {% for num, name in months %}
+          <option value="{{ num }}" {% if sel_month == num %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Year -->
+      <div class="col-6 col-md-2">
+        <label class="form-label fw-semibold" style="font-size:.78rem;text-transform:uppercase;color:#64748b">Year</label>
+        <select name="year" class="form-select form-select-sm">
+          {% for y in years %}
+          <option value="{{ y }}" {% if sel_year == y %}selected{% endif %}>{{ y }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Grade -->
+      <div class="col-6 col-md-2">
+        <label class="form-label fw-semibold" style="font-size:.78rem;text-transform:uppercase;color:#64748b">Class</label>
+        <select name="grade_id" class="form-select form-select-sm"
+                onchange="loadSections(this.value)">
+          <option value="">-- All Classes --</option>
+          {% for g in grades %}
+          <option value="{{ g.id }}" {% if sel_grade == g.id|stringformat:"s" %}selected{% endif %}>
+            {{ g.grade }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Section -->
+      <div class="col-6 col-md-2">
+        <label class="form-label fw-semibold" style="font-size:.78rem;text-transform:uppercase;color:#64748b">Section</label>
+        <select name="sec_id" class="form-select form-select-sm" id="secSelect">
+          <option value="">-- All Sections --</option>
+          {% for g in grades %}{% for sec in g.section_set.all %}
+          <option value="{{ sec.id }}" {% if sel_sec == sec.id|stringformat:"s" %}selected{% endif %}>
+            {{ g.grade }} - {{ sec.section }}
+          </option>
+          {% endfor %}{% endfor %}
+        </select>
+      </div>
+
+      <!-- Search -->
+      <div class="col-md-3">
+        <label class="form-label fw-semibold" style="font-size:.78rem;text-transform:uppercase;color:#64748b">Search</label>
+        <div class="input-group input-group-sm">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input type="text" name="q" class="form-control"
+                 placeholder="Name or Roll..." value="{{ search }}">
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="col-md-1">
+        <button type="submit" class="btn btn-primary btn-sm w-100">Go</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Fee Records Table -->
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center"
+       style="background:linear-gradient(135deg,#4f46e5,#3730a3);color:#fff;border-radius:14px 14px 0 0">
+    <span class="fw-bold">
+      <i class="bi bi-receipt me-2"></i>Fee Payment Records — {{ sel_month }}/{{ sel_year }}
+    </span>
+    <span class="badge bg-light text-dark">{{ fee_records|length }} Students</span>
+  </div>
+
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead style="background:#f1f5f9">
+          <tr>
+            <th class="ps-3" style="width:40px">#</th>
+            <th>Student</th>
+            <th>Class / Section</th>
+            <th class="text-center">Amount</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Paid Date</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rec in fee_records %}
+          <tr>
+            <td class="ps-3 text-muted">{{ forloop.counter }}</td>
+
+            <!-- Student -->
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="rounded-circle bg-primary d-flex align-items-center
+                            justify-content-center text-white"
+                     style="width:34px;height:34px;font-weight:700;flex-shrink:0;font-size:.85rem">
+                  {{ rec.student.Name|first }}
+                </div>
+                <div>
+                  <div class="fw-semibold">{{ rec.student.Name }}</div>
+                  <small class="text-muted">{{ rec.student.Roll }}</small>
+                </div>
+              </div>
+            </td>
+
+            <!-- Class / Section -->
+            <td>
+              <div style="font-size:.85rem">{{ rec.student.grade.grade|default:"—" }}</div>
+              <span style="background:#ede9fe;color:#4f46e5;padding:.15rem .6rem;
+                           border-radius:20px;font-size:.75rem;font-weight:600">
+                Section {{ rec.student.section.section|default:"—" }}
+              </span>
+            </td>
+
+            <!-- Amount -->
+            <td class="text-center">
+              {% if rec.payment.amount > 0 %}
+                <span class="fw-bold text-success">Rs. {{ rec.payment.amount }}</span>
+              {% else %}
+                <span class="text-muted small">Not set</span>
+              {% endif %}
+            </td>
+
+            <!-- Status Badge -->
+            <td class="text-center">
+              {% if rec.payment.status == 'paid' %}
+                <span class="badge px-3 py-2"
+                      style="background:#dcfce7;color:#166534;border-radius:20px">
+                  <i class="bi bi-check-circle me-1"></i>Paid
+                </span>
+              {% else %}
+                <span class="badge px-3 py-2"
+                      style="background:#fee2e2;color:#991b1b;border-radius:20px">
+                  <i class="bi bi-clock me-1"></i>Pending
+                </span>
+              {% endif %}
+            </td>
+
+            <!-- Paid Date -->
+            <td class="text-center">
+              {% if rec.payment.paid_date %}
+                <small class="text-success">{{ rec.payment.paid_date }}</small>
+              {% else %}
+                <small class="text-muted">—</small>
+              {% endif %}
+            </td>
+
+            <!-- Action Button -->
+            <td class="text-center">
+              {% if rec.payment.status == 'pending' %}
+                <!-- Mark Paid Button -->
+                <button class="btn btn-sm btn-success px-3"
+                        onclick="openModal('{{ rec.payment.id }}', '{{ rec.student.Name }}', 'paid')">
+                  <i class="bi bi-check2 me-1"></i>Mark Paid
+                </button>
+              {% else %}
+                <!-- Mark Pending Button -->
+                <button class="btn btn-sm btn-outline-danger px-3"
+                        onclick="openModal('{{ rec.payment.id }}', '{{ rec.student.Name }}', 'pending')">
+                  <i class="bi bi-arrow-counterclockwise me-1"></i>Undo
+                </button>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center text-muted py-5">
+              <i class="bi bi-funnel" style="font-size:3rem;opacity:.3"></i>
+              <p class="mt-2 mb-0">
+                {% if sel_grade or sel_sec or search %}
+                  No students found for selected filters.
+                {% else %}
+                  Please select a class, section, or search by name to view fee records.
+                {% endif %}
+              </p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── Status Change Modal ── -->
+<div class="modal fade" id="statusModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:14px;border:none">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold" id="modalTitle">Confirm Action</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST">
+        {% csrf_token %}
+        <div class="modal-body pt-2">
+          <p class="text-muted" id="modalMsg"></p>
+          <div>
+            <label class="form-label fw-semibold" style="font-size:.82rem;text-transform:uppercase;color:#64748b">
+              Remarks (Optional)
+            </label>
+            <input type="text" name="remarks" class="form-control"
+                   placeholder="e.g. Cash received, Online transfer...">
+          </div>
+          <input type="hidden" name="payment_id" id="modalPaymentId">
+          <input type="hidden" name="action"     id="modalAction">
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-outline-secondary"
+                  data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary px-4" id="modalConfirmBtn">
+            Confirm
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Open confirm modal
+  function openModal(paymentId, studentName, action) {
+    document.getElementById('modalPaymentId').value = paymentId;
+    document.getElementById('modalAction').value    = `mark_${action}`;
+
+    if (action === 'paid') {
+      document.getElementById('modalTitle').textContent = 'Mark Fee as Paid';
+      document.getElementById('modalMsg').textContent   =
+        `Mark ${studentName}'s fee as PAID for this month?`;
+      document.getElementById('modalConfirmBtn').className = 'btn btn-success px-4';
+      document.getElementById('modalConfirmBtn').textContent = 'Yes, Mark Paid';
+    } else {
+      document.getElementById('modalTitle').textContent = 'Undo Payment';
+      document.getElementById('modalMsg').textContent   =
+        `Mark ${studentName}'s fee back to PENDING?`;
+      document.getElementById('modalConfirmBtn').className = 'btn btn-danger px-4';
+      document.getElementById('modalConfirmBtn').textContent = 'Yes, Mark Pending';
+    }
+
+    new bootstrap.Modal(document.getElementById('statusModal')).show();
+  }
+
+  // Load sections when grade is changed in filter
+  function loadSections(gradeId) {
+    const sel = document.getElementById('secSelect');
+    // Remove old options except "All Sections"
+    while (sel.options.length > 1) sel.remove(1);
+    if (!gradeId) return;
+    fetch('/cls/sections/?grade_id=' + gradeId)
+      .then(r => r.json())
+      .then(data => {
+        data.sections.forEach(s => {
+          const opt = new Option(
+            `Section ${s.name} (${s.count} students)`, s.id);
+          sel.add(opt);
+        });
+      });
+  }
+</script>
+{% endblock %}

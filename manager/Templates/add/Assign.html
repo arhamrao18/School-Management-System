@@ -1,0 +1,46 @@
+{% extends 'add/base.html' %}
+{% block title %}Assign Subject{% endblock %}
+{% block breadcrumb %}Assign Subject{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-header text-white" style="background:linear-gradient(135deg,#059669,#047857)">
+        <i class="bi bi-plus-circle me-2"></i>
+        Assign Subject — {{ teacher.First_Name }} {{ teacher.Last_Name }}
+      </div>
+      <div class="card-body p-4">
+        <form method="POST">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Subject *</label>
+            <select name="Subject" class="form-select" required>
+              <option value="">-- Select subject  --</option>
+              {% for sub in subjects %}
+              <option value="{{ sub.S }}">{{ sub.S }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Section *</label>
+            <select name="clas" class="form-select" required>
+              <option value="">-- Select Section --</option>
+              {% for sec in sections %}
+              <option value="{{ sec.id }}">{{ sec.grade }} — Section {{ sec.section }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success px-4">
+              <i class="bi bi-save me-1"></i>Assign
+            </button>
+            <a href="{% url 'Show' teacher.Employee_ID %}" class="btn btn-outline-secondary px-4">
+              Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

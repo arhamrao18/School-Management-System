@@ -1,0 +1,57 @@
+{% extends 'add/base.html' %}
+{% block title %}Students — {{ section }}{% endblock %}
+{% block breadcrumb %}{{ section }} — Students{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0"><i class="bi bi-people me-2"></i>{{ section }} — Students</h5>
+  <a href="{% url 'Home' %}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+</div>
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="GET" class="row g-2">
+      <div class="col">
+        <input type="text" name="q" class="form-control" placeholder="Search by name or roll..." value="{{ query }}">
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-primary">Search</button>
+        <a href="?">Reset</a>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead style="background:#4f46e5;color:#fff">
+        <tr><th>#</th><th>Roll</th><th>Name</th><th>Father</th><th>Contact</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for s in students %}
+        <tr>
+          <td class="text-muted">{{ forloop.counter }}</td>
+          <td><span class="badge bg-secondary">{{ s.Roll }}</span></td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              {% if s.Image %}<img src="{{ s.Image.url }}" class="rounded-circle" style="width:32px;height:32px;object-fit:cover">
+              {% else %}<div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white" style="width:32px;height:32px;font-size:.8rem;font-weight:700">{{ s.Name|first }}</div>{% endif %}
+              <span class="fw-semibold">{{ s.Name }}</span>
+            </div>
+          </td>
+          <td class="text-muted">{{ s.F_Name }}</td>
+          <td><small>{{ s.Contact }}</small></td>
+          <td>
+            <div class="d-flex gap-1">
+              <a href="{% url 'StudentUpdate' s.id %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+              <a href="{% url 'AdminResult' s.id %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-bar-chart"></i></a>
+              <a href="{% url 'FeeVoucher' s.Roll %}" class="btn btn-sm btn-outline-success"><i class="bi bi-receipt"></i></a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-muted py-4">No student found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

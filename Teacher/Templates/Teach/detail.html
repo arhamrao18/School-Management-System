@@ -1,0 +1,66 @@
+{% extends 'Teach/Base.html' %}
+{% block title %}Students — {{ section }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0">
+    <i class="bi bi-people me-2"></i>
+    {{ section.grade.grade }} — Section {{ section.section }}
+  </h5>
+  <a href="/tech/board/{{ request.session.ID }}/" class="btn btn-outline-secondary btn-sm">
+    ← Dashboard
+  </a>
+</div>
+
+<!-- Search -->
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="GET" class="row g-2">
+      <div class="col">
+        <input type="text" name="q" class="form-control"
+               placeholder="Roll or with name..." value="{{ request.GET.q }}">
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-primary">Search</button>
+        <a href="?" class="btn btn-outline-secondary">Reset</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header fw-semibold" style="background:#312e81;color:#fff">
+    <i class="bi bi-people me-2"></i>Students ({{ students|length }})
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead style="background:#f1f5f9">
+        <tr><th>#</th><th>Roll</th><th>Name</th><th>Father Name</th><th>Contact</th></tr>
+      </thead>
+      <tbody>
+        {% for s in students %}
+        <tr>
+          <td class="text-muted">{{ forloop.counter }}</td>
+          <td><span class="badge bg-secondary">{{ s.Roll }}</span></td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
+                   style="width:32px;height:32px;font-weight:700;flex-shrink:0">
+                {{ s.Name|first }}
+              </div>
+              <span class="fw-semibold">{{ s.Name }}</span>
+            </div>
+          </td>
+          <td class="text-muted">{{ s.F_Name }}</td>
+          <td><small>{{ s.Contact }}</small></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-muted py-4">
+          <i class="bi bi-inbox" style="font-size:2rem"></i>
+          <p class="mt-2 mb-0">No student found.</p>
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

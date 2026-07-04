@@ -1,0 +1,68 @@
+{% extends 'add/base.html' %}
+{% block title %}Teachers{% endblock %}
+{% block breadcrumb %}Teacher List{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0"><i class="bi bi-people me-2"></i>Teachers ({{ teachers|length }})</h5>
+  <div class="d-flex gap-2">
+    <a href="{% url 'AutoAssign' %}" class="btn btn-warning btn-sm"><i class="bi bi-magic me-1"></i>Auto-Assign</a>
+    <a href="{% url 'Save' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus me-1"></i>Add Teacher</a>
+  </div>
+</div>
+<!-- Search -->
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="GET" class="row g-2">
+      <div class="col">
+        <input type="text" name="q" class="form-control" placeholder="ID ya naam se search..." value="{{ query }}">
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-primary">Search</button>
+        <a href="{% url 'Teacher' %}" class="btn btn-outline-secondary">Reset</a>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead style="background:#4f46e5;color:#fff">
+        <tr><th>#</th><th>ID</th><th>Name</th><th>Qualification</th><th>Specialization</th><th>Contact</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for t in teachers %}
+        <tr>
+          <td class="text-muted">{{ forloop.counter }}</td>
+          <td><span class="badge bg-info text-dark">{{ t.Employee_ID }}</span></td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              {% if t.Image %}<img src="{{ t.Image.url }}" class="rounded-circle" style="width:34px;height:34px;object-fit:cover">
+              {% else %}<div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white" style="width:34px;height:34px;font-weight:700">{{ t.First_Name|first }}</div>{% endif %}
+              <span class="fw-semibold">{{ t.First_Name }} {{ t.Last_Name }}</span>
+            </div>
+          </td>
+          <td><small class="badge bg-light text-dark">{{ t.Qualification }}</small></td>
+          <td><small class="text-muted">{{ t.specialization|default:"—" }}</small></td>
+          <td><small>{{ t.Contact }}</small></td>
+          <td>
+            <div class="d-flex gap-1">
+              <a href="{% url 'TeacherUpdate' t.id %}" class="btn btn-sm btn-outline-warning" title="Update">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <a href="{% url 'Show' t.Employee_ID %}" class="btn btn-sm btn-outline-primary" title="View Assignments">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="{% url 'Assign' t.Employee_ID %}" class="btn btn-sm btn-outline-success" title="Assign Subject">
+                <i class="bi bi-plus-circle"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center text-muted py-4">No teacher found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

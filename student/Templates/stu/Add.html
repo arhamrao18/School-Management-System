@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Add Student — GV School</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary   : #4f46e5;
+      --primary-d : #3730a3;
+      --bg        : #f1f5f9;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+    }
+
+    .top-nav {
+      background: linear-gradient(135deg, #1e1b4b, #4f46e5);
+      padding: .85rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 12px rgba(0,0,0,.25);
+    }
+    .top-nav .brand {
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .top-nav .back-btn {
+      background: rgba(255,255,255,.15);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 8px;
+      padding: .4rem 1rem;
+      font-size: .88rem;
+      text-decoration: none;
+      transition: .2s;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+    .top-nav .back-btn:hover {
+      background: rgba(255,255,255,.28);
+      color: #fff;
+    }
+
+    .card {
+      border: none;
+      border-radius: 16px;
+      box-shadow: 0 2px 16px rgba(0,0,0,.08);
+    }
+    .card-header-grad {
+      background: linear-gradient(135deg, #4f46e5, #3730a3);
+      color: #fff;
+      border-radius: 16px 16px 0 0;
+      padding: 1.2rem 1.5rem;
+    }
+
+    .form-control, .form-select {
+      border-radius: 9px;
+      border: 1.5px solid #e2e8f0;
+      font-size: .9rem;
+      padding: .55rem .9rem;
+      transition: .2s;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79,70,229,.12);
+    }
+    .form-label {
+      font-weight: 600;
+      font-size: .82rem;
+      color: #475569;
+      margin-bottom: .3rem;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+
+    .input-group-text {
+      background: #f8faff;
+      border: 1.5px solid #e2e8f0;
+      border-right: none;
+      border-radius: 9px 0 0 9px;
+      color: #94a3b8;
+    }
+    .input-group .form-control {
+      border-left: none;
+      border-radius: 0 9px 9px 0;
+    }
+    .input-group .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: none;
+    }
+    .input-group:focus-within .input-group-text {
+      border-color: var(--primary);
+    }
+
+    .section-divider {
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #94a3b8;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: .4rem;
+      margin: 1.2rem 0 1rem;
+    }
+
+    .btn { border-radius: 9px; font-weight: 600; }
+    .btn-primary {
+      background: linear-gradient(135deg, #4f46e5, #3730a3);
+      border: none;
+      padding: .65rem 1.5rem;
+    }
+    .btn-primary:hover { opacity: .92; transform: translateY(-1px); }
+
+    .alert { border-radius: 10px; border: none; font-size: .9rem; }
+
+    .table th {
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      font-weight: 700;
+    }
+    .table td { vertical-align: middle; font-size: .88rem; }
+    .table-hover tbody tr:hover { background: #f8faff; }
+
+    .section-badge {
+      background: #ede9fe;
+      color: #4f46e5;
+      padding: .2rem .7rem;
+      border-radius: 20px;
+      font-size: .78rem;
+      font-weight: 600;
+    }
+
+    .avatar {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: .8rem;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a class="brand" href="{% url 'Home' %}">
+    <i class="bi bi-mortarboard-fill"></i> GV School Admin
+  </a>
+  <a class="back-btn" href="{% url 'Home' %}">
+    <i class="bi bi-arrow-left"></i> Back to Dashboard
+  </a>
+</nav>
+
+<div class="container py-4">
+
+  {% for msg in messages %}
+  <div class="alert alert-{% if msg.tags == 'error' %}danger{% else %}{{ msg.tags }}{% endif %} alert-dismissible fade show d-flex align-items-center gap-2">
+    <i class="bi bi-{% if msg.tags == 'error' %}exclamation-circle{% else %}check-circle{% endif %}"></i>
+    <span>{{ msg }}</span>
+    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+
+  <div class="row g-4">
+
+    <!-- ══ Left: Add Student Form ══ -->
+    <div class="col-lg-5">
+      <div class="card h-100">
+        <div class="card-header-grad">
+          <h5 class="mb-0 fw-bold">
+            <i class="bi bi-person-plus me-2"></i>Add New Student
+          </h5>
+          <small style="opacity:.8">
+            Select class and section for the new student
+          </small>
+        </div>
+
+        <div class="card-body p-4">
+          <form method="POST" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            <div class="section-divider">
+              <i class="bi bi-person me-1"></i>Personal Information
+            </div>
+
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label">Student Name *</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-person"></i></span>
+                  <input type="text" name="Name" class="form-control"
+                         placeholder="Full name" required>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Roll Number *</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-hash"></i></span>
+                  <input type="text" name="Roll" class="form-control"
+                         placeholder="e.g. CLI0001" required>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Email *</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                  <input type="email" name="Email" class="form-control"
+                         placeholder="student@email.com" required>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Login Password *</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                  <input type="password" name="loginPassword" class="form-control"
+                         placeholder="Student portal password" required>
+                  <button class="btn btn-outline-secondary border" type="button"
+                          onclick="togglePass(this)">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-divider mt-3">
+              <i class="bi bi-people me-1"></i>Family Information
+            </div>
+
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label">Father Name *</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                  <input type="text" name="F_Name" class="form-control"
+                         placeholder="Father's full name" required>
+                </div>
+              </div>
+
+              <div class="col-md-7">
+                <label class="form-label">Father CNIC *</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-credit-card"></i></span>
+                  <input type="text" name="F_cnic" class="form-control"
+                         placeholder="36102-1313450-9"
+                         pattern="^\d{5}-\d{7}-\d{1}$"
+                         title="Format: 36102-1313450-9"
+                         maxlength="15" required
+                         oninput="formatCnic(this)">
+                </div>
+                <small class="text-muted">Format: 36102-1313450-9</small>
+              </div>
+
+              <div class="col-md-5">
+                <label class="form-label">Contact *</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                  <input type="text" name="Contact" class="form-control"
+                         placeholder="03XX-XXXXXXX" required>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Address</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                  <input type="text" name="Address" class="form-control"
+                         placeholder="House no, street, city">
+                </div>
+              </div>
+            </div>
+
+            <div class="section-divider mt-3">
+              <i class="bi bi-mortarboard me-1"></i>Academic Information
+            </div>
+
+            <div class="row g-3">
+              <!-- Class -->
+              <div class="col-md-6">
+                <label class="form-label">Class *</label>
+                <select name="grade_id" class="form-select" id="gradeSelect"
+                        onchange="loadSections(this.value)" required>
+                  <option value="" disabled selected>-- Select Class --</option>
+                  {% for g in grades %}
+                  <option value="{{ g.id }}">{{ g.grade }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Section: now mandatory, manual only -->
+              <div class="col-md-6">
+                <label class="form-label">Section *</label>
+                <select name="section_id" class="form-select" id="sectionSelect" required>
+                  <option value="" disabled selected>-- Select Class First --</option>
+                    {% for s in sections %}
+                  <option value="{{ s.id }}">{{ s.section }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Student Photo</label>
+                <input type="file" name="image" class="form-control"
+                       accept="image/*" onchange="previewImage(this)">
+                <div id="imgPreview" class="mt-2" style="display:none">
+                  <img id="previewImg" src="" alt="Preview"
+                       class="rounded-3" style="height:70px;object-fit:cover">
+                </div>
+              </div>
+            </div>
+
+            <div class="d-grid mt-4">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="bi bi-save me-2"></i>Save Student
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Right: Students Table ══ -->
+    <div class="col-lg-7">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center"
+             style="background:#1e1b4b;color:#fff;border-radius:16px 16px 0 0;padding:1rem 1.5rem">
+          <span class="fw-bold">
+            <i class="bi bi-people me-2"></i>All Students
+          </span>
+          <span class="badge bg-light text-dark">{{ students|length }} Total</span>
+        </div>
+
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead style="background:#f1f5f9">
+                <tr>
+                  <th class="ps-3">#</th>
+                  <th>Roll</th>
+                  <th>Name</th>
+                  <th>Class</th>
+                  <th>Section</th>
+                  <th>Change Section</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for st in students %}
+                <tr>
+                  <td class="ps-3 text-muted">{{ forloop.counter }}</td>
+                  <td>
+                    <span class="badge bg-secondary">{{ st.Roll }}</span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="avatar">{{ st.Name|first }}</div>
+                      <span class="fw-semibold">{{ st.Name }}</span>
+                    </div>
+                  </td>
+                  <td class="text-muted small">
+                    {{ st.grade.grade|default:"—" }}
+                  </td>
+                  <td>
+                    <span class="section-badge">
+                      {{ st.section.section|default:"—" }}
+                    </span>
+                  </td>
+                  <td>
+                    <!-- Section Change Form -->
+                    <form method="POST" action="{% url 'ChangeSection' %}"
+                          class="d-flex gap-1 align-items-center">
+                      {% csrf_token %}
+                      <input type="hidden" name="student_id" value="{{ st.id }}">
+                      <select name="new_section_id"
+                              class="form-select form-select-sm"
+                              style="min-width:110px;font-size:.78rem">
+                        {% if st.grade %}
+                          {% for sec in st.grade.section_set.all %}
+                          <option value="{{ sec.id }}"
+                            {% if sec == st.section %}selected{% endif %}>
+                            Sec {{ sec.section }}
+                          </option>
+                          {% endfor %}
+                        {% endif %}
+                      </select>
+                      <button type="submit"
+                              class="btn btn-sm btn-warning px-2"
+                              title="Change Section">
+                        <i class="bi bi-arrow-left-right"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center text-muted py-5">
+                    <i class="bi bi-inbox" style="font-size:2.5rem;opacity:.4"></i>
+                    <p class="mt-2 mb-0">No students added yet.</p>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Load sections for the selected class — admin manually picks one, no auto-assign
+  function loadSections(gradeId) {
+    const sel = document.getElementById('sectionSelect');
+    if (!gradeId) {
+      sel.innerHTML = '<option value="" disabled selected>-- Select Class First --</option>';
+      return;
+    }
+    sel.innerHTML = '<option value="" disabled selected>-- Select Section --</option>';
+    fetch('/cls/sections/?grade_id='+gradeId)
+      .then(r => r.json())
+      .then(data => {
+        if (!data.sections.length) {
+          sel.innerHTML = '<option value="" disabled selected>No sections — add one first</option>';
+          return;
+        }
+        data.sections.forEach(s => {
+          sel.innerHTML += `<option value="${s.id}">Section ${s.name}</option>`;
+        });
+      });
+  }
+
+  // Auto-format CNIC as user types: 36102-1313450-9
+  function formatCnic(input) {
+    let val = input.value.replace(/\D/g, '');
+    if (val.length > 5)  val = val.slice(0,5)  + '-' + val.slice(5);
+    if (val.length > 13) val = val.slice(0,13) + '-' + val.slice(13);
+    input.value = val.slice(0, 15);
+  }
+
+  // Show/hide password
+  function togglePass(btn) {
+    const input = btn.previousElementSibling;
+    const icon  = btn.querySelector('i');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.className = 'bi bi-eye-slash';
+    } else {
+      input.type = 'password';
+      icon.className = 'bi bi-eye';
+    }
+  }
+
+  // Preview selected image before upload
+  function previewImage(input) {
+    const preview = document.getElementById('imgPreview');
+    const img     = document.getElementById('previewImg');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        img.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+</script>
+</body>
+</html>

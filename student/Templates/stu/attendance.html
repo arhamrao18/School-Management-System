@@ -1,0 +1,102 @@
+{% extends 'stu/base.html' %}
+{% block title %}My Attendance{% endblock %}
+{% block nav_att %}active{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="card">
+    <div class="card-header text-white" style="background:linear-gradient(135deg,#059669,#047857)">
+      <i class="bi bi-calendar-check me-2"></i>Monthly Attendance
+    </div>
+    <div class="card-body">
+      <!-- Month/Year Filter -->
+      <form method="GET" class="row g-2 mb-4">
+        <div class="col-6 col-md-3">
+          <select name="month" class="form-select">
+            {% for num, name in months %}
+            <option value="{{ num }}" {% if sel_month == num %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-6 col-md-2">
+          <select name="year" class="form-select">
+            {% for y in years %}
+            <option value="{{ y }}" {% if sel_year == y %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-success w-100">Filter</button>
+        </div>
+      </form>
+
+      <!-- Summary Boxes -->
+      <div class="row g-3 mb-4">
+        <div class="col-3 text-center">
+          <div class="p-3 rounded-3" style="background:#dcfce7">
+            <div class="fw-bold fs-3" style="color:#166534">{{ summary.present }}</div>
+            <small style="color:#166534"><i class="bi bi-check-circle me-1"></i>Present</small>
+          </div>
+        </div>
+        <div class="col-3 text-center">
+          <div class="p-3 rounded-3" style="background:#fee2e2">
+            <div class="fw-bold fs-3" style="color:#991b1b">{{ summary.absent }}</div>
+            <small style="color:#991b1b"><i class="bi bi-x-circle me-1"></i>Absent</small>
+          </div>
+        </div>
+        <div class="col-3 text-center">
+          <div class="p-3 rounded-3" style="background:#fef3c7">
+            <div class="fw-bold fs-3" style="color:#854d0e">{{ summary.leave }}</div>
+            <small style="color:#854d0e"><i class="bi bi-calendar2-minus me-1"></i>Leave</small>
+          </div>
+        </div>
+        <div class="col-3 text-center">
+          <div class="p-3 rounded-3" style="background:#e0f2fe">
+            <div class="fw-bold fs-3" style="color:#0c4a6e">{{ summary.total }}</div>
+            <small style="color:#0c4a6e"><i class="bi bi-calendar3 me-1"></i>Total Days</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Records Table -->
+      {% if records %}
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead style="background:#059669;color:#fff">
+            <tr><th>#</th><th>Date</th><th>Day</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            {% for r in records %}
+            <tr>
+              <td class="text-muted">{{ forloop.counter }}</td>
+              <td>{{ r.date }}</td>
+              <td class="text-muted">{{ r.date|date:"l" }}</td>
+              <td>
+                {% if r.status == 'P' %}
+                  <span class="badge" style="background:#dcfce7;color:#166534;padding:.4rem .8rem">
+                    <i class="bi bi-check-circle me-1"></i>Present
+                  </span>
+                {% elif r.status == 'A' %}
+                  <span class="badge" style="background:#fee2e2;color:#991b1b;padding:.4rem .8rem">
+                    <i class="bi bi-x-circle me-1"></i>Absent
+                  </span>
+                {% else %}
+                  <span class="badge" style="background:#fef3c7;color:#854d0e;padding:.4rem .8rem">
+                    <i class="bi bi-calendar2-minus me-1"></i>Leave
+                  </span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="text-center text-muted py-4">
+        <i class="bi bi-calendar-x" style="font-size:3rem"></i>
+        <p class="mt-2">No record found of that month.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

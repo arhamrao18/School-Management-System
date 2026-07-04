@@ -1,0 +1,86 @@
+{% extends 'add/base.html' %}
+{% block title %}{{ student.Name }} — Result{% endblock %}
+{% block breadcrumb %}Student Result{% endblock %}
+{% block content %}
+<!-- Student Info -->
+<div class="card mb-3">
+  <div class="card-body d-flex align-items-center gap-3">
+    {% if student.Image %}
+    <img src="{{ student.Image.url }}" class="rounded-circle" style="width:60px;height:60px;object-fit:cover">
+    {% else %}
+    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
+         style="width:60px;height:60px;font-size:1.4rem;font-weight:700">{{ student.Name|first }}</div>
+    {% endif %}
+    <div>
+      <h5 class="mb-0">{{ student.Name }}</h5>
+      <small class="text-muted">Roll: {{ student.Roll }} | {{ student.grade.grade }} — Section {{ student.section.section }}</small>
+    </div>
+    <a href="{% url 'AllResults' %}" class="btn btn-outline-secondary btn-sm ms-auto">← Back</a>
+  </div>
+</div>
+
+{% if has_result %}
+  <!-- Overall Summary -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card text-center p-3" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff">
+        <div style="font-size:2rem;font-weight:700">{{ percentage }}%</div>
+        <div class="small">Overall Percentage</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center p-3" style="background:linear-gradient(135deg,#059669,#047857);color:#fff">
+        <div style="font-size:2rem;font-weight:700">{{ total_obt }}/{{ total_max }}</div>
+        <div class="small">Marks Obtained</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center p-3" style="background:linear-gradient(135deg,#d97706,#b45309);color:#fff">
+        <div style="font-size:2rem;font-weight:700">{{ grade_letter }}</div>
+        <div class="small">Grade</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Per-Term breakdown -->
+  {% for term_name, marks in terms.items %}
+  <div class="card mb-3">
+    <div class="card-header fw-semibold" style="background:#f1f5f9">
+      <i class="bi bi-bookmark me-2"></i>{{ term_name }}
+    </div>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <thead class="table-dark">
+          <tr><th>Subject</th><th>Obtained</th><th>Total</th><th>%</th><th>Grade</th></tr>
+        </thead>
+        <tbody>
+          {% for m in marks %}
+          <tr>
+            <td>{{ m.subject }}</td>
+            <td>{{ m.obt_marks }}</td>
+            <td>{{ m.total_marks }}</td>
+            <td>{{ m.percentage }}%</td>
+            <td>
+              {% if m.percentage >= 80 %}<span class="badge bg-success">A</span>
+              {% elif m.percentage >= 70 %}<span class="badge bg-primary">B</span>
+              {% elif m.percentage >= 60 %}<span class="badge bg-warning text-dark">C</span>
+              {% else %}<span class="badge bg-danger">Fail</span>{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endfor %}
+
+{% else %}
+  <div class="card">
+    <div class="card-body text-center py-5 text-muted">
+      <i class="bi bi-file-earmark-x" style="font-size:3rem;color:#dc2626"></i>
+      <h5 class="mt-3">No result uploaded yet!</h5>
+      <p>Marks is not uploaded of that student.</p>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

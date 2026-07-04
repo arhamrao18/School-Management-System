@@ -1,0 +1,55 @@
+{% extends 'add/base.html' %}
+{% block title %}Update Assignment{% endblock %}
+{% block breadcrumb %}Update Assignment{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-header text-white" style="background:linear-gradient(135deg,#d97706,#b45309)">
+        <i class="bi bi-pencil me-2"></i>Assignment Update / Delete
+      </div>
+      <div class="card-body p-4">
+        <!-- Current Info -->
+        <div class="alert alert-info mb-4">
+          <strong>Current:</strong> {{ subject.Subject }} →
+          {{ subject.clas.grade }} Section {{ subject.clas.section }}
+        </div>
+
+        <form method="POST">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Change subject</label>
+            <select name="subject" class="form-select">
+              {% for sub in subjects %}
+              <option value="{{ sub.S }}" {% if sub.S == subject.Subject %}selected{% endif %}>
+                {{ sub.S }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Change Section</label>
+            <select name="clas" class="form-select">
+              {% for sec in sections %}
+              <option value="{{ sec.id }}" {% if sec == subject.clas %}selected{% endif %}>
+                {{ sec.grade }} — Section {{ sec.section }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" name="action" value="update" class="btn btn-warning px-4">
+              <i class="bi bi-save me-1"></i>Update
+            </button>
+            <button type="submit" name="action" value="delete" class="btn btn-danger px-4"
+                    onclick="return confirm('Want to delete?')">
+              <i class="bi bi-trash me-1"></i>Delete
+            </button>
+            <a href="javascript:history.back()" class="btn btn-outline-secondary px-4">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

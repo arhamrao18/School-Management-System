@@ -1,0 +1,151 @@
+{% extends 'add/base.html' %}
+{% block title %}Teacher Attendance{% endblock %}
+{% block breadcrumb %}Teacher Attendance{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0">
+    <i class="bi bi-calendar-check me-2"></i>Teacher Attendance — {{ today }}
+  </h5>
+  <a href="{% url 'AttendanceHistory' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-clock-history me-1"></i>History
+  </a>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    {% if already %}
+    <!-- Already taken today -->
+    <div class="alert alert-success">
+      <i class="bi bi-check-circle me-2"></i>
+      Today <strong>{{ today }}</strong> is taken already.
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-dark">
+          <tr><th>#</th><th>Employee ID</th><th>Name</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          {% for t in teachers %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td><span class="badge bg-info text-dark">{{ t.Employee_ID }}</span></td>
+            <td>{{ t.First_Name }} {{ t.Last_Name }}</td>
+            <td>
+              {% with st=existing|default:None %}
+              {% for tid, stat in existing.items %}{% if tid == t.id %}
+                {% if stat == 'P' %}
+                  <span class="badge badge-present px-3 py-2">
+                    <i class="bi bi-check-circle me-1"></i>Present
+                  </span>
+                {% elif stat == 'A' %}
+                  <span class="badge badge-absent px-3 py-2">
+                    <i class="bi bi-x-circle me-1"></i>Absent
+                  </span>
+                {% else %}
+                  <span class="badge badge-leave px-3 py-2">
+                    <i class="bi bi-calendar2-minus me-1"></i>Leave
+                  </span>
+                {% endif %}
+              {% endif %}{% endfor %}
+              {% endwith %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% else %}
+    <!-- Attendance Form -->
+    <div class="mb-3 d-flex gap-2 flex-wrap align-items-center">
+      <span class="fw-semibold text-muted me-2">Mark all together:</span>
+      <button type="button" class="btn btn-sm btn-success" onclick="markAll('P')">
+        <i class="bi bi-check-all me-1"></i>All are present
+      </button>
+      <button type="button" class="btn btn-sm btn-warning text-dark" onclick="markAll('L')">
+        Sab Leave
+      </button>
+      <button type="button" class="btn btn-sm btn-danger" onclick="markAll('A')">
+        Sab Absent
+      </button>
+    </div>
+
+    <form method="POST">
+      {% csrf_token %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead style="background:#4f46e5;color:#fff">
+            <tr>
+              <th style="width:5%">#</th>
+              <th style="width:15%">Employee ID</th>
+              <th style="width:30%">Teacher</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for t in teachers %}
+            <tr>
+              <td class="text-muted">{{ forloop.counter }}</td>
+              <td><span class="badge bg-secondary">{{ t.Employee_ID }}</span></td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  {% if t.Image %}
+                  <img src="{{ t.Image.url }}" class="rounded-circle"
+                       style="width:36px;height:36px;object-fit:cover">
+                  {% else %}
+                  <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
+                       style="width:36px;height:36px;font-weight:700;flex-shrink:0">
+                    {{ t.First_Name|first }}
+                  </div>
+                  {% endif %}
+                  <div>
+                    <div class="fw-semibold">{{ t.First_Name }} {{ t.Last_Name }}</div>
+                    <small class="text-muted">{{ t.Qualification }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex gap-2 flex-wrap">
+                  <label class="att-label">
+                    <input type="radio" name="status_{{ t.id }}" value="P" class="att-radio" checked>
+                    <span class="att-btn present-btn"><i class="bi bi-check-circle me-1"></i>Present</span>
+                  </label>
+                  <label class="att-label">
+                    <input type="radio" name="status_{{ t.id }}" value="L" class="att-radio">
+                    <span class="att-btn leave-btn"><i class="bi bi-calendar2-minus me-1"></i>Leave</span>
+                  </label>
+                  <label class="att-label">
+                    <input type="radio" name="status_{{ t.id }}" value="A" class="att-radio">
+                    <span class="att-btn absent-btn"><i class="bi bi-x-circle me-1"></i>Absent</span>
+                  </label>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center text-muted py-4">
+              No teacher found. Firstly <a href="{% url 'Save' %}">add teacher</a>.
+            </td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% if teachers %}
+      <div class="text-end mt-3">
+        <button type="submit" class="btn btn-primary btn-lg px-5">
+          <i class="bi bi-save me-2"></i>Save attendance
+        </button>
+      </div>
+      {% endif %}
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function markAll(status) {
+  document.querySelectorAll(`input[type="radio"][value="${status}"]`)
+    .forEach(r => r.checked = true);
+}
+</script>
+{% endblock %}

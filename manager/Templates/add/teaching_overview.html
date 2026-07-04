@@ -1,0 +1,59 @@
+{% extends 'add/base.html' %}
+{% block title %}Teaching Overview{% endblock %}
+{% block breadcrumb %}Who Teaches What{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Teacher → Subject → Section Overview</h5>
+  <a href="{% url 'AutoAssign' %}" class="btn btn-warning btn-sm">
+    <i class="bi bi-magic me-1"></i>Re-Run Auto-Assign
+  </a>
+</div>
+
+<div class="row g-3">
+  {% for item in overview %}
+  {% if item.assigns %}
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center gap-2" style="background:#f8faff">
+        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
+             style="width:36px;height:36px;font-weight:700;flex-shrink:0">
+          {{ item.teacher.First_Name|first }}
+        </div>
+        <div>
+          <div class="fw-bold">{{ item.teacher.First_Name }} {{ item.teacher.Last_Name }}</div>
+          <small class="text-muted">{{ item.teacher.Employee_ID }} | {{ item.teacher.Qualification }}</small>
+        </div>
+        <a href="{% url 'Show' item.teacher.Employee_ID %}" class="btn btn-sm btn-outline-primary ms-auto">
+          <i class="bi bi-pencil"></i>
+        </a>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          <thead style="background:#f1f5f9">
+            <tr><th>Subject</th><th>Class</th><th>Section</th></tr>
+          </thead>
+          <tbody>
+            {% for a in item.assigns %}
+            <tr>
+              <td><span class="badge" style="background:#ede9fe;color:#4f46e5">{{ a.Subject }}</span></td>
+              <td>{{ a.clas.grade }}</td>
+              <td>{{ a.clas.section }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  {% empty %}
+  <div class="col-12 text-center text-muted py-5">
+    <i class="bi bi-inbox" style="font-size:3rem"></i>
+    <p class="mt-2">No assignment found -- Run auto-assignment.</p>
+    <a href="{% url 'AutoAssign' %}" class="btn btn-primary">
+      <i class="bi bi-magic me-1"></i>Auto-Assign
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

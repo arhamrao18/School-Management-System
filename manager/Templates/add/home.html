@@ -1,0 +1,129 @@
+{% extends 'add/base.html' %}
+{% block title %}Dashboard — GV School{% endblock %}
+{% block breadcrumb %}Dashboard{% endblock %}
+{% block nav_dash %}active{% endblock %}
+
+{% block content %}
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-xl-3">
+    <div class="stat-card" style="background:linear-gradient(135deg,#4f46e5,#7c3aed)">
+      <div class="s-num">{{ total_students }}</div>
+      <div class="s-lbl"><i class="bi bi-people me-1"></i>Total Students</div>
+      <div class="s-ico"><i class="bi bi-people-fill"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-xl-3">
+    <div class="stat-card" style="background:linear-gradient(135deg,#0891b2,#0e7490)">
+      <div class="s-num">{{ total_teachers }}</div>
+      <div class="s-lbl"><i class="bi bi-person-badge me-1"></i>Teachers</div>
+      <div class="s-ico"><i class="bi bi-person-badge-fill"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-xl-3">
+    <div class="stat-card" style="background:linear-gradient(135deg,#059669,#047857)">
+      <div class="s-num">{{ total_sections }}</div>
+      <div class="s-lbl"><i class="bi bi-collection me-1"></i>Sections</div>
+      <div class="s-ico"><i class="bi bi-collection-fill"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-xl-3">
+    <div class="stat-card" style="background:linear-gradient(135deg,#d97706,#b45309)">
+      <div class="s-num">{{ today|date:"d M" }}</div>
+      <div class="s-lbl"><i class="bi bi-calendar3 me-1"></i>{{ today|date:"l" }}</div>
+      <div class="s-ico"><i class="bi bi-calendar-date-fill"></i></div>
+    </div>
+  </div>
+</div>
+
+<!-- Today Teacher Attendance + Quick Actions -->
+<div class="row g-3 mb-4">
+  <!-- Attendance Summary -->
+  <div class="col-md-5">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center" style="background:#4f46e5;color:#fff">
+        <span><i class="bi bi-calendar-check me-2"></i>Today's Teacher Attendance</span>
+        <a href="{% url 'TeacherAttendance' %}" class="btn btn-light btn-sm">Take</a>
+      </div>
+      <div class="card-body">
+        <div class="row text-center g-2">
+          <div class="col-4">
+            <div class="p-3 rounded-3" style="background:#dcfce7">
+              <div style="font-size:1.7rem;font-weight:700;color:#166534">{{ att_summary.present }}</div>
+              <small style="color:#166534">Present</small>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="p-3 rounded-3" style="background:#fee2e2">
+              <div style="font-size:1.7rem;font-weight:700;color:#991b1b">{{ att_summary.absent }}</div>
+              <small style="color:#991b1b">Absent</small>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="p-3 rounded-3" style="background:#fef3c7">
+              <div style="font-size:1.7rem;font-weight:700;color:#854d0e">{{ att_summary.leave }}</div>
+              <small style="color:#854d0e">Leave</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="col-md-7">
+    <div class="card h-100">
+      <div class="card-header bg-dark text-white"><i class="bi bi-lightning me-2"></i>Quick Actions</div>
+      <div class="card-body d-flex flex-wrap gap-2 align-content-start">
+        <a href="{% url 'Adds' %}" class="btn btn-primary btn-sm"><i class="bi bi-person-plus me-1"></i>Add Student</a>
+        <a href="{% url 'Save' %}" class="btn btn-info text-white btn-sm"><i class="bi bi-person-plus me-1"></i>Add Teacher</a>
+        <a href="{% url 'AutoAssign' %}" class="btn btn-warning btn-sm"><i class="bi bi-magic me-1"></i>Auto-Assign Teachers</a>
+        <a href="{% url 'TeachingOverview' %}" class="btn btn-secondary btn-sm"><i class="bi bi-diagram-3 me-1"></i>Who Teaches What</a>
+        <a href="{% url 'TeacherAttendance' %}" class="btn btn-success btn-sm"><i class="bi bi-calendar-check me-1"></i>Teacher Attendance</a>
+        <a href="{% url 'TeacherSalary' %}" class="btn btn-danger btn-sm"><i class="bi bi-cash me-1"></i>Salary</a>
+        <a href="{% url 'ClassFee' %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-receipt me-1"></i>Class Fee</a>
+        <a href="{% url 'AllResults' %}" class="btn btn-outline-success btn-sm"><i class="bi bi-bar-chart me-1"></i>View Results</a>
+          <a href="{% url 'Timetable' %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-calendar-week me-1"></i>Timetable</a>
+          <a href="{% url 'FeeStatus' %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-calendar-week me-1"></i>Fee Status</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sections Grid -->
+<div class="card">
+  <div class="card-header" style="background:#312e81;color:#fff">
+    <i class="bi bi-grid me-2"></i>Classes & Sections — Click here to check the students
+  </div>
+  <div class="card-body">
+    <div class="row g-3">
+      {% for sec in sections %}
+      <div class="col-6 col-md-3 col-lg-2">
+        <a href="{% url 'Stu' sec.id %}" class="text-decoration-none">
+          <div class="card text-center p-3 h-100 section-tile">
+            <i class="bi bi-mortarboard" style="font-size:1.6rem;color:#4f46e5"></i>
+            <div class="fw-bold mt-1">{{ sec.grade }}</div>
+            <div class="small text-muted">Section {{ sec.section }}</div>
+            <span class="badge bg-primary mt-2">{{ sec.student_count }} students</span>
+          </div>
+        </a>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center text-muted py-4">
+        <i class="bi bi-inbox" style="font-size:3rem"></i>
+        <p class="mt-2">Firstly add classes</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .section-tile { transition: .2s; cursor: pointer; }
+  .section-tile:hover { background: #4f46e5 !important; color: #fff !important; transform: translateY(-4px); }
+  .section-tile:hover * { color: #fff !important; }
+  .section-tile:hover .badge { background: rgba(255,255,255,.3) !important; }
+</style>
+{% endblock %}

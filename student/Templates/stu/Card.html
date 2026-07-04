@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Result Card — {{ S.Name }}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body { background: #f1f5f9; font-family: 'Segoe UI', sans-serif; }
+    .result-card {
+      max-width: 800px; margin: 2rem auto; background: #fff;
+      border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,.1); overflow: hidden;
+    }
+    .result-header {
+      background: linear-gradient(135deg,#1e1b4b,#4f46e5);
+      color: #fff; padding: 2rem; text-align: center;
+    }
+    .result-header .school-name { font-size: 1.5rem; font-weight: 700; }
+    .result-header .student-info { font-size: .9rem; opacity: .85; margin-top: .5rem; }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff; }
+      .result-card { box-shadow: none; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+<div class="result-card">
+
+  <!-- Header -->
+  <div class="result-header">
+    <div class="school-name">
+      <i class="bi bi-mortarboard me-2"></i>GV School — Result Card
+    </div>
+    <div class="student-info">
+      {{ S.Name }} | Roll: {{ S.Roll }} |
+      {{ S.grade.grade|default:"" }} — Section {{ S.section.section|default:"" }}
+    </div>
+  </div>
+
+  <div class="p-4">
+
+    {% if result_locked %}
+    <!-- ── Result Locked — not all subjects uploaded ── -->
+    <div class="text-center py-5">
+      <i class="bi bi-lock-fill" style="font-size:3.5rem;color:#dc2626"></i>
+      <h5 class="mt-3 text-danger">Result Not Available Yet</h5>
+      <p class="text-muted">
+        Marks uploaded for
+        <strong>{{ uploaded_count }} / {{ assigned_count }}</strong> subjects.<br>
+        <strong>{{ missing_count }}</strong> subject(s) still pending.<br>
+        Result will be visible once all subject marks are uploaded.
+      </p>
+      <a href="/stu/menue/{{ S.Roll }}/" class="btn btn-outline-secondary mt-2 no-print">
+        ← Dashboard
+      </a>
+    </div>
+
+    {% elif subjects %}
+    <!-- ── Full Result ── -->
+
+    <!-- Overall Summary -->
+    <div class="row g-3 mb-4 text-center">
+      <div class="col-4">
+        <div class="p-3 rounded-3" style="background:#ede9fe">
+          <div class="fw-bold fs-3" style="color:#4f46e5">{{ Percentage|floatformat:1 }}%</div>
+          <small class="text-muted">Percentage</small>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="p-3 rounded-3" style="background:#dcfce7">
+          <div class="fw-bold fs-3" style="color:#059669">{{ Total }}/{{ Sum }}</div>
+          <small class="text-muted">Marks</small>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="p-3 rounded-3"
+             style="background:{% if Grade == 'Fail' %}#fee2e2{% else %}#fef3c7{% endif %}">
+          <div class="fw-bold fs-3"
+               style="color:{% if Grade == 'Fail' %}#dc2626{% else %}#d97706{% endif %}">
+            {{ Grade }}
+          </div>
+          <small class="text-muted">Grade</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Marks Table -->
+    <div class="mb-4">
+      <h6 class="fw-bold border-bottom pb-2">
+        <i class="bi bi-bookmark me-2"></i>Subject-wise Result
+      </h6>
+      <table class="table table-sm table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th>Subject</th>
+            <th class="text-center">Obtained</th>
+            <th class="text-center">Total</th>
+            <th class="text-center">%</th>
+            <th class="text-center">Grade</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in subjects %}
+          {% with pct=m.obt_marks|floatformat:0 %}
+          <tr>
+            <td>{{ m.subject }}</td>
+            <td class="text-center">{{ m.obt_marks }}</td>
+            <td class="text-center">{{ m.total_marks }}</td>
+            <td class="text-center">
+              {{ m.obt_marks|floatformat:0 }}%
+            </td>
+            <td class="text-center">
+              {% if m.obt_marks >= 80 %}<span class="badge bg-success">A</span>
+              {% elif m.obt_marks >= 70 %}<span class="badge bg-primary">B</span>
+              {% elif m.obt_marks >= 60 %}<span class="badge bg-warning text-dark">C</span>
+              {% else %}<span class="badge bg-danger">Fail</span>{% endif %}
+            </td>
+          </tr>
+          {% endwith %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Print Button -->
+    <div class="no-print text-center mt-3">
+      <button onclick="window.print()" class="btn btn-primary me-2">
+        <i class="bi bi-printer me-1"></i>Print / Download
+      </button>
+      <a href="/stu/menue/{{ S.Roll }}/" class="btn btn-outline-secondary">← Dashboard</a>
+    </div>
+
+    {% else %}
+    <!-- ── No Marks Uploaded At All ── -->
+    <div class="text-center py-5">
+      <i class="bi bi-file-earmark-x" style="font-size:4rem;color:#dc2626"></i>
+      <h5 class="mt-3 text-danger">No Result Uploaded Yet</h5>
+      <p class="text-muted">
+        Your result has not been uploaded yet.<br>
+        Please contact your teacher or admin.
+      </p>
+      <a href="/stu/menue/{{ S.Roll }}/" class="btn btn-primary mt-2 no-print">← Dashboard</a>
+    </div>
+
+    {% endif %}
+
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

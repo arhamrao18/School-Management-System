@@ -1,0 +1,64 @@
+{% extends 'add/base.html' %}
+{% block title %}Auto-Assign Teachers{% endblock %}
+{% block breadcrumb %}Auto-Assign{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-header text-white" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)">
+        <i class="bi bi-magic me-2"></i>Automatic Teacher Assignment
+      </div>
+      <div class="card-body p-4">
+
+        <!-- Stats -->
+        <div class="row g-3 mb-4 text-center">
+          <div class="col-4">
+            <div class="p-3 rounded-3 bg-light">
+              <div class="fw-bold fs-3 text-primary">{{ teachers_count }}</div>
+              <small class="text-muted">Teachers</small>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="p-3 rounded-3 bg-light">
+              <div class="fw-bold fs-3 text-success">{{ sections_count }}</div>
+              <small class="text-muted">Sections</small>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="p-3 rounded-3 bg-light">
+              <div class="fw-bold fs-3 text-warning">{{ subjects_count }}</div>
+              <small class="text-muted">Subjects</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Logic Explanation -->
+        <div class="alert alert-info mb-4">
+          <h6 class="fw-bold"><i class="bi bi-info-circle me-2"></i>Assignment Logic:</h6>
+          <ul class="mb-0 small">
+            <li><strong>Specialization Match:</strong>Specialization in subject help in matching.</li>
+            <li><strong>Class I–III (Low):</strong> Assign BA/BSc qualified teachers. </li>
+            <li><strong>Class IV–VI (High):</strong>Prefer MSc/MA+ qualified teachers. </li>
+            <li><strong>Qualification Match:</strong> Subject name in degree provide a lot of help.</li>
+          </ul>
+        </div>
+
+        <div class="alert alert-warning">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          <strong>Pay attention:</strong> After clicking <strong>all the assignments will delete</strong> and makes new one.
+        </div>
+
+        <form method="POST">
+          {% csrf_token %}
+          <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-primary btn-lg flex-fill">
+              <i class="bi bi-magic me-2"></i>Yes do Auto-Assign
+            </button>
+            <a href="{% url 'Home' %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

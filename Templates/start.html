@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Green Valley High School</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.5.0/dist/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #ffffff;
+      --bg-sec: #f8f9fa;
+      --bg-ter: #f1f3f5;
+      --text: #111827;
+      --text-sec: #6b7280;
+      --border: rgba(0,0,0,0.08);
+      --border-md: rgba(0,0,0,0.12);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* ── NAV ── */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      height: 68px;
+      border-bottom: 0.5px solid var(--border);
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .nav-emblem {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #1e3a8a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .nav-emblem i { color: #fff; font-size: 18px; }
+    .nav-name { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -.01em; }
+    .nav-right { display: flex; align-items: center; gap: 6px; }
+    .nav-link {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text-sec);
+      text-decoration: none;
+      transition: all .15s;
+      border: 0.5px solid transparent;
+    }
+    .nav-link:hover { background: var(--bg-sec); color: var(--text); }
+    .nav-divider { width: 0.5px; height: 20px; background: var(--border-md); margin: 0 4px; }
+    .nav-admin {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      background: #1e3a8a;
+      color: #fff;
+      text-decoration: none;
+      transition: background .15s;
+    }
+    .nav-admin:hover { background: #1e40af; }
+    .nav-admin i { font-size: 13px; }
+
+    /* ── HERO ── */
+    .hero {
+      background: #0f1e45;
+      padding: 72px 40px 64px;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 60px;
+      align-items: center;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255,255,255,.08);
+      border: 0.5px solid rgba(255,255,255,.12);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 11px;
+      color: rgba(255,255,255,.6);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      width: fit-content;
+    }
+    .hero-eyebrow-dot { width: 5px; height: 5px; border-radius: 50%; background: #60a5fa; flex-shrink: 0; }
+    .hero-title {
+      font-size: 52px;
+      font-weight: 600;
+      line-height: 1.05;
+      letter-spacing: -.03em;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    .hero-title em { font-style: normal; color: #60a5fa; }
+    .hero-sub {
+      font-size: 14px;
+      color: rgba(255,255,255,.55);
+      line-height: 1.8;
+      max-width: 420px;
+      margin-bottom: 36px;
+    }
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+    .hbtn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 22px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all .15s;
+    }
+    .hbtn i { font-size: 14px; }
+    .hbtn-blue { background: #2563eb; color: #fff; border: 0.5px solid #3b82f6; }
+    .hbtn-blue:hover { background: #1d4ed8; }
+    .hbtn-outline { background: rgba(255,255,255,.06); color: rgba(255,255,255,.8); border: 0.5px solid rgba(255,255,255,.15); }
+    .hbtn-outline:hover { background: rgba(255,255,255,.1); }
+
+    /* HERO CARD */
+    .hero-card {
+      background: rgba(255,255,255,.06);
+      border: 0.5px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .hc-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1px;
+      background: rgba(255,255,255,.08);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 22px;
+    }
+    .hc-stat { background: rgba(255,255,255,.05); padding: 18px 12px; text-align: center; }
+    .hc-num { font-size: 24px; font-weight: 600; color: #fff; display: block; line-height: 1; }
+    .hc-lbl { font-size: 10px; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .07em; margin-top: 5px; display: block; }
+    .hc-news-label { font-size: 10px; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px; }
+    .hc-news-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 0.5px solid rgba(255,255,255,.07); }
+    .hc-news-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .hc-dot { width: 4px; height: 4px; border-radius: 50%; background: #60a5fa; flex-shrink: 0; margin-top: 6px; }
+    .hc-news-text { font-size: 12px; color: rgba(255,255,255,.65); line-height: 1.55; }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-bottom: 0.5px solid var(--border);
+    }
+    .sb-item {
+      padding: 22px 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-right: 0.5px solid var(--border);
+    }
+    .sb-item:last-child { border-right: none; }
+    .sb-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .sb-icon i { font-size: 17px; color: #fff; }
+    .sb-num { font-size: 20px; font-weight: 600; color: var(--text); display: block; line-height: 1.1; }
+    .sb-lbl { font-size: 11px; color: var(--text-sec); margin-top: 3px; display: block; }
+
+    /* ── CONTENT ── */
+    .content {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .col {
+      padding: 28px 30px;
+      border-right: 0.5px solid var(--border);
+    }
+    .col:last-child { border-right: none; }
+    .col-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .col-icon { width: 30px; height: 30px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .col-icon i { font-size: 14px; color: #fff; }
+    .col-title { font-size: 13px; font-weight: 600; color: var(--text); }
+
+    /* Events */
+    .event { display: flex; gap: 14px; padding: 10px 0; border-bottom: 0.5px solid var(--border); align-items: flex-start; }
+    .event:last-child { border-bottom: none; }
+    .ev-date {
+      width: 38px;
+      flex-shrink: 0;
+      background: var(--bg-sec);
+      border-radius: 8px;
+      padding: 6px 4px;
+      text-align: center;
+      border: 0.5px solid var(--border);
+    }
+    .ev-d { font-size: 17px; font-weight: 600; color: #2563eb; display: block; line-height: 1; }
+    .ev-m { font-size: 9px; color: var(--text-sec); text-transform: uppercase; letter-spacing: .06em; display: block; margin-top: 2px; }
+    .ev-title { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+    .ev-sub { font-size: 11px; color: var(--text-sec); }
+
+    /* Notices */
+    .notice { padding: 10px 0; border-bottom: 0.5px solid var(--border); }
+    .notice:last-child { border-bottom: none; }
+    .ntag { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 5px; letter-spacing: .03em; }
+    .nt-urgent { background: #fee2e2; color: #991b1b; }
+    .nt-info { background: #dbeafe; color: #1e40af; }
+    .nt-success { background: #d1fae5; color: #065f46; }
+    .nt-warn { background: #fef3c7; color: #92400e; }
+    .notice-text { font-size: 12px; color: var(--text-sec); line-height: 1.6; }
+
+    /* Quick links */
+    .ql-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .ql {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 9px;
+      background: var(--bg-sec);
+      border: 0.5px solid var(--border);
+      text-decoration: none;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 500;
+      transition: all .15s;
+    }
+    .ql:hover { background: var(--bg-ter); border-color: var(--border-md); }
+    .ql i { font-size: 15px; color: var(--text-sec); }
+
+    /* ── FOOTER ── */
+    .footer {
+      padding: 18px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-sec);
+      border-top: 0.5px solid var(--border);
+    }
+    .footer-left { font-size: 12px; color: var(--text-sec); }
+    .footer-right { display: flex; gap: 18px; }
+    .footer-right a { font-size: 12px; color: var(--text-sec); text-decoration: none; }
+    .footer-right a:hover { color: var(--text); }
+
+    @media (max-width: 768px) {
+      .nav { padding: 0 16px; }
+      .nav-name { font-size: 13px; }
+      .hero { grid-template-columns: 1fr; padding: 48px 20px 40px; }
+      .hero-card { display: none; }
+      .hero-title { font-size: 36px; }
+      .stats-bar { grid-template-columns: 1fr 1fr; }
+      .sb-item { border-bottom: 0.5px solid var(--border); }
+      .content { grid-template-columns: 1fr; }
+      .col { border-right: none; border-bottom: 0.5px solid var(--border); }
+      .footer { flex-direction: column; gap: 10px; text-align: center; padding: 16px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="#" class="nav-brand">
+      <div class="nav-emblem"><i class="ti ti-school"></i></div>
+      <span class="nav-name">Green Valley High School</span>
+    </a>
+    <div class="nav-right">
+      <a href="about/" class="nav-link">About</a>
+      <a href="contact/" class="nav-link">Contact us</a>
+      <div class="nav-divider"></div>
+      <a href="man/" class="nav-admin"><i class="ti ti-shield-lock"></i>Admin panel</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div>
+      <div class="hero-eyebrow"><div class="hero-eyebrow-dot"></div>Session 2024–25 · Active</div>
+      <h1 class="hero-title">Green Valley<br><em>High School</em></h1>
+      <p class="hero-sub">Excellence in education since 1994. A community dedicated to nurturing every student's potential — academically, morally, and creatively.</p>
+      <div class="hero-btns">
+        <a href="tech/" class="hbtn hbtn-blue"><i class="ti ti-chalkboard"></i>Teacher portal</a>
+        <a href="stu/" class="hbtn hbtn-outline"><i class="ti ti-user-graduate"></i>Student portal</a>
+          <a href="part/" class="hbtn hbtn-outline"><i class="ti ti-user-graduate"></i>Parent portal</a>
+      </div>
+    </div>
+    <div class="hero-card">
+      <div class="hc-stats">
+        <div class="hc-stat"><span class="hc-num">1,240</span><span class="hc-lbl">Students</span></div>
+        <div class="hc-stat"><span class="hc-num">87</span><span class="hc-lbl">Teachers</span></div>
+        <div class="hc-stat"><span class="hc-num">96%</span><span class="hc-lbl">Pass rate</span></div>
+      </div>
+      <div class="hc-news-label">Latest updates</div>
+      <div class="hc-news-item"><div class="hc-dot"></div><span class="hc-news-text">Annual exams schedule released for Feb 2025</span></div>
+      <div class="hc-news-item"><div class="hc-dot"></div><span class="hc-news-text">New science lab inauguration — Jan 20</span></div>
+      <div class="hc-news-item"><div class="hc-dot"></div><span class="hc-news-text">Fee submission deadline: Jan 31, 2025</span></div>
+    </div>
+  </section>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="sb-item">
+      <div class="sb-icon" style="background:#1e3a8a"><i class="ti ti-users"></i></div>
+      <div><span class="sb-num">1,240</span><span class="sb-lbl">Total students</span></div>
+    </div>
+    <div class="sb-item">
+      <div class="sb-icon" style="background:#065f46"><i class="ti ti-chalkboard"></i></div>
+      <div><span class="sb-num">87</span><span class="sb-lbl">Teaching staff</span></div>
+    </div>
+    <div class="sb-item">
+      <div class="sb-icon" style="background:#92400e"><i class="ti ti-door"></i></div>
+      <div><span class="sb-num">24</span><span class="sb-lbl">Classrooms</span></div>
+    </div>
+    <div class="sb-item">
+      <div class="sb-icon" style="background:#5b21b6"><i class="ti ti-trophy"></i></div>
+      <div><span class="sb-num">96%</span><span class="sb-lbl">Board pass rate</span></div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <!-- Events -->
+    <div class="col">
+      <div class="col-head">
+        <div class="col-icon" style="background:#2563eb"><i class="ti ti-calendar-event"></i></div>
+        <span class="col-title">Upcoming events</span>
+      </div>
+      <div class="event">
+        <div class="ev-date"><span class="ev-d">20</span><span class="ev-m">Jan</span></div>
+        <div><div class="ev-title">Science lab inauguration</div><div class="ev-sub">Main Hall · 10:00 AM</div></div>
+      </div>
+      <div class="event">
+        <div class="ev-date"><span class="ev-d">28</span><span class="ev-m">Jan</span></div>
+        <div><div class="ev-title">Annual sports day</div><div class="ev-sub">School ground · 8:00 AM</div></div>
+      </div>
+      <div class="event">
+        <div class="ev-date"><span class="ev-d">05</span><span class="ev-m">Feb</span></div>
+        <div><div class="ev-title">Annual exams begin</div><div class="ev-sub">All classes · as per schedule</div></div>
+      </div>
+      <div class="event">
+        <div class="ev-date"><span class="ev-d">14</span><span class="ev-m">Feb</span></div>
+        <div><div class="ev-title">Parent-teacher meeting</div><div class="ev-sub">Classes 9–12 · 2:00 PM</div></div>
+      </div>
+    </div>
+
+    <!-- Notices -->
+    <div class="col">
+      <div class="col-head">
+        <div class="col-icon" style="background:#d97706"><i class="ti ti-speakerphone"></i></div>
+        <span class="col-title">Notices & circulars</span>
+      </div>
+      <div class="notice">
+        <span class="ntag nt-urgent">Urgent</span>
+        <div class="notice-text">Fee submission deadline is January 31. Late fine of Rs. 50/day will apply after due date.</div>
+      </div>
+      <div class="notice">
+        <span class="ntag nt-info">Academic</span>
+        <div class="notice-text">Revised exam timetable for Class 10 & 12 is now available on the student portal.</div>
+      </div>
+      <div class="notice">
+        <span class="ntag nt-success">Admission</span>
+        <div class="notice-text">Admissions open for Class 1 to 8 for session 2025–26. Forms available at the front office.</div>
+      </div>
+      <div class="notice">
+        <span class="ntag nt-warn">Holiday</span>
+        <div class="notice-text">School will remain closed on January 23 in observance of Kashmir Day.</div>
+      </div>
+    </div>
+
+    <!-- Quick links -->
+    <div class="col">
+      <div class="col-head">
+        <div class="col-icon" style="background:#7c3aed"><i class="ti ti-layout-grid"></i></div>
+        <span class="col-title">Quick access</span>
+      </div>
+      <div class="ql-grid">
+        <a href="tech/" class="ql"><i class="ti ti-chalkboard"></i>Teacher login</a>
+        <a href="stu/" class="ql"><i class="ti ti-user-graduate"></i>Student login</a>
+        <a href="man/" class="ql"><i class="ti ti-shield-lock"></i>Admin panel</a>
+        <a href="#" class="ql"><i class="ti ti-calendar"></i>Timetable</a>
+        <a href="#" class="ql"><i class="ti ti-report"></i>Result card</a>
+        <a href="#" class="ql"><i class="ti ti-cash"></i>Fee portal</a>
+        <a href="#" class="ql"><i class="ti ti-book"></i>Library</a>
+        <a href="#" class="ql"><i class="ti ti-phone"></i>Contact us</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <span class="footer-left">© 2025 Green Valley High School · Est. 1994 · All rights reserved</span>
+    <div class="footer-right">
+      <a href="#">Privacy policy</a>
+      <a href="#">Terms of use</a>
+      <a href="#">Help & support</a>
+    </div>
+  </footer>
+
+</body>
+</html>

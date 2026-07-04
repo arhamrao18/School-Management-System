@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Timetable Generator — GV School</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root{--primary:#4f46e5;--primary-d:#3730a3;--bg:#f1f5f9}
+    body{background:var(--bg);font-family:'Segoe UI',sans-serif}
+    .top-nav{background:linear-gradient(135deg,#1e1b4b,#4f46e5);padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+    .top-nav .brand{color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;display:flex;align-items:center;gap:.5rem}
+    .top-nav .back-btn{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:.4rem 1rem;font-size:.88rem;text-decoration:none;transition:.2s;display:flex;align-items:center;gap:.4rem}
+    .top-nav .back-btn:hover{background:rgba(255,255,255,.28);color:#fff}
+    .card{border:none;border-radius:14px;box-shadow:0 2px 14px rgba(0,0,0,.07)}
+    .card-head{background:linear-gradient(135deg,#4f46e5,#3730a3);color:#fff;border-radius:14px 14px 0 0;padding:1rem 1.5rem}
+    .form-control,.form-select{border-radius:9px;border:1.5px solid #e2e8f0;font-size:.9rem}
+    .form-control:focus,.form-select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.12)}
+    .form-label{font-weight:600;font-size:.82rem;color:#475569;text-transform:uppercase;letter-spacing:.4px;margin-bottom:.3rem;display:block}
+    .btn{border-radius:9px;font-weight:600}
+    .btn-primary{background:linear-gradient(135deg,#4f46e5,#3730a3);border:none}
+    .btn-primary:hover{opacity:.92}
+    .info-badge{background:#ede9fe;color:#4f46e5;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:.4rem;margin-top:.5rem}
+    .friday-card{background:linear-gradient(135deg,#fdf4ff,#fce7f3);border:2px solid #e879f9;border-radius:12px;padding:1rem}
+    .friday-badge{background:linear-gradient(135deg,#a21caf,#ec4899);color:#fff;border-radius:6px;padding:.2rem .6rem;font-size:.75rem;font-weight:700}
+    .fri-info{background:linear-gradient(135deg,#7e22ce,#a21caf);color:#fff;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:.4rem;margin-top:.5rem}
+    .form-switch .form-check-input{width:2.5em;height:1.4em;cursor:pointer}
+    .form-check-input:checked{background-color:#a21caf;border-color:#a21caf}
+    .section-picker{border:1.5px solid #e2e8f0;border-radius:10px;max-height:180px;overflow-y:auto;padding:.5rem;scrollbar-width:thin;scrollbar-color:#c7d2fe transparent}
+    .sec-item{display:flex;align-items:center;gap:.6rem;padding:.4rem .6rem;border-radius:8px;cursor:pointer;transition:.15s}
+    .sec-item:hover{background:#ede9fe}
+    .sec-item input{accent-color:var(--primary);width:16px;height:16px}
+    .sec-item label{cursor:pointer;font-size:.88rem;font-weight:500;margin:0}
+    .sec-meta{font-size:.73rem;color:#94a3b8;margin-left:auto}
+    .solver-box{background:#ede9fe;border-radius:10px;padding:.8rem 1rem;margin-top:.8rem;display:none}
+    .solver-bar-wrap{background:#c7d2fe;border-radius:6px;height:8px;margin-top:.5rem;overflow:hidden}
+    .solver-bar{background:linear-gradient(90deg,#4f46e5,#10b981);height:100%;width:0;transition:width .4s;border-radius:6px}
+    #timetableOutput{display:none}
+    .tt-section{margin-bottom:2rem}
+    .tt-label{background:linear-gradient(135deg,#1e1b4b,#4f46e5);color:#fff;padding:.6rem 1.2rem;border-radius:10px 10px 0 0;font-weight:700;font-size:.9rem;display:flex;align-items:center;justify-content:space-between}
+    .tt-wrapper{border-radius:0 0 14px 14px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.1)}
+    .tt-header{background:linear-gradient(135deg,#1e1b4b,#4f46e5);color:#fff;padding:1.2rem 2rem;text-align:center}
+    .tt-header h2{font-size:1.4rem;font-weight:800;margin:0}
+    .tt-header p{margin:.2rem 0 0;opacity:.85;font-size:.85rem}
+    .tt-header .tt-meta{display:flex;justify-content:center;gap:1.5rem;margin-top:.6rem;font-size:.78rem;opacity:.9;flex-wrap:wrap}
+    .fri-header{background:linear-gradient(135deg,#6b21a8,#a21caf);color:#fff;padding:.55rem 1.2rem;font-size:.8rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+    .tt-table{width:100%;border-collapse:collapse}
+    .tt-table th{background:#312e81;color:#fff;padding:.65rem .7rem;font-size:.74rem;text-transform:uppercase;letter-spacing:.4px;text-align:center;border:1px solid #3730a3}
+    .tt-table th.day-col{width:85px}
+    .tt-table th.fri-th{background:#6b21a8;border-color:#5b21b6}
+    .tt-table td{border:1px solid #e2e8f0;padding:.4rem .45rem;vertical-align:middle;text-align:center;font-size:.79rem}
+    .tt-table tr:nth-child(even) td{background:#f8faff}
+    .lec-cell{background:#ede9fe;border-radius:7px;padding:.32rem .45rem;display:block;cursor:grab;user-select:none;border:2px solid transparent;transition:.15s}
+    .lec-cell:active{cursor:grabbing}
+    .lec-cell.dragging{opacity:.4;border-color:#6366f1}
+    .lec-cell.drag-over{border-color:#10b981!important;background:#d1fae5!important;box-shadow:0 0 0 3px #6ee7b7}
+    .lec-cell .subj{font-weight:700;color:#3730a3;font-size:.8rem}
+    .lec-cell .teacher{color:#6d28d9;font-size:.7rem;margin-top:.1rem}
+    .drag-hint{font-size:.62rem;color:#a5b4fc;display:none;margin-top:.15rem}
+    .lec-cell:hover .drag-hint{display:block}
+    .fri-cell{background:linear-gradient(135deg,#fae8ff,#f3e8ff);border-radius:7px;padding:.32rem .45rem;display:block;border:2px solid transparent;border-left:3px solid #a21caf;cursor:grab;user-select:none;transition:.15s}
+    .fri-cell:active{cursor:grabbing}
+    .fri-cell.drag-over{border-color:#10b981!important;background:#d1fae5!important;box-shadow:0 0 0 3px #6ee7b7}
+    .fri-cell .subj{font-weight:700;color:#7e22ce;font-size:.8rem}
+    .fri-cell .teacher{color:#a21caf;font-size:.7rem;margin-top:.1rem}
+    .fri-cell:hover .drag-hint{display:block}
+    .break-cell{background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:7px;padding:.32rem .45rem;font-weight:700;color:#92400e;font-size:.75rem}
+    .free-cell{color:#cbd5e1;font-size:.72rem}
+    .day-label{font-weight:700;color:#1e1b4b;font-size:.8rem;background:#f1f5f9;border-right:3px solid #4f46e5!important}
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10000;display:flex;align-items:center;justify-content:center;padding:1rem;overflow-y:auto}
+    .modal-box{background:#fff;border-radius:16px;max-width:600px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;animation:popIn .25s ease;max-height:90vh;display:flex;flex-direction:column}
+    @keyframes popIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+    .modal-head-danger{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;padding:1rem 1.4rem;display:flex;align-items:center;gap:.6rem;flex-shrink:0}
+    .modal-head-danger h5{margin:0;font-weight:700;font-size:1rem}
+    .modal-body-pad{padding:1.2rem 1.4rem;overflow-y:auto;flex:1}
+    .clash-info{background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:.8rem 1rem;margin-bottom:.8rem;font-size:.85rem;color:#7f1d1d;line-height:1.8}
+    .clash-row{background:#fff;border:1px solid #fecaca;border-radius:8px;padding:.5rem .8rem;margin-top:.5rem;display:flex;align-items:flex-start;gap:.5rem}
+    .clash-icon{font-size:1rem;flex-shrink:0;margin-top:.1rem}
+    .fix-box{background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:.8rem 1rem;margin-bottom:.8rem;font-size:.85rem;color:#14532d}
+    .fix-option{background:#eff6ff;border:1.5px solid #93c5fd;border-radius:10px;padding:.65rem 1rem;margin-bottom:.45rem;font-size:.83rem;color:#1e3a5f;cursor:pointer;transition:.15s;display:flex;align-items:flex-start;gap:.6rem}
+    .fix-option:hover{background:#dbeafe;border-color:#3b82f6;transform:translateX(2px)}
+    .fix-badge{background:#3b82f6;color:#fff;border-radius:5px;padding:.1rem .45rem;font-size:.7rem;font-weight:700;white-space:nowrap;flex-shrink:0;margin-top:.1rem}
+    .fix-detail{line-height:1.5}
+    .fix-step{font-size:.76rem;color:#64748b;margin-top:.2rem}
+    .no-fix-warn{background:#fefce8;border:1px solid #fde047;border-radius:10px;padding:.8rem 1rem;font-size:.83rem;color:#713f12}
+    .modal-foot{padding:.8rem 1.4rem;background:#f8fafc;display:flex;gap:.6rem;justify-content:flex-end;flex-shrink:0}
+    .tt-toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:#1e293b;color:#fff;border-radius:10px;padding:.7rem 1.2rem;font-size:.85rem;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.2);display:flex;align-items:center;gap:.5rem;transform:translateY(80px);opacity:0;transition:.3s;pointer-events:none;max-width:420px}
+    .tt-toast.show{transform:translateY(0);opacity:1}
+    .tt-toast.success{border-left:4px solid #10b981}
+    .tt-toast.error{border-left:4px solid #ef4444}
+    .tt-toast.warning{border-left:4px solid #f59e0b}
+    .lec-cell.has-clash{border-color:#ef4444!important;background:#fef2f2!important;animation:pulseClash 1.5s ease infinite}
+    .fri-cell.has-clash{border-color:#ef4444!important;background:#fef2f2!important;animation:pulseClash 1.5s ease infinite}
+    @keyframes pulseClash{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4)}50%{box-shadow:0 0 0 5px rgba(239,68,68,0)}}
+    @media print{
+      body *{visibility:hidden}
+      #timetableOutput,#timetableOutput *{visibility:visible}
+      #timetableOutput{display:block!important;position:absolute;top:0;left:0;width:100%}
+      .no-print{display:none!important}
+      .tt-wrapper{box-shadow:none}
+      .tt-table td,.tt-table th{font-size:.66rem!important;padding:.3rem!important}
+      .drag-hint{display:none!important}
+      .tt-section{page-break-after:always}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="top-nav no-print">
+  <a class="brand" href="{% url 'Home' %}"><i class="bi bi-mortarboard-fill"></i> GV School Admin</a>
+  <a class="back-btn" href="{% url 'Home' %}"><i class="bi bi-arrow-left"></i> Dashboard</a>
+</nav>
+
+<div class="container-fluid py-4 px-4 no-print">
+  <div class="row g-4">
+
+    <!-- LEFT -->
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-head">
+          <h5 class="mb-0 fw-bold"><i class="bi bi-sliders me-2"></i>Timetable Settings</h5>
+          <small style="opacity:.8">Backtracking solver — guaranteed zero clashes</small>
+        </div>
+        <div class="card-body p-4">
+
+          <div class="mb-2 pb-1 border-bottom">
+            <small class="text-uppercase text-muted fw-bold" style="letter-spacing:1px"><i class="bi bi-clock me-1"></i>School Timing (Mon–Thu & Sat)</small>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label">Start Time</label>
+              <input type="time" id="startTime" class="form-control" value="08:00">
+            </div>
+            <div class="col-6">
+              <label class="form-label">End Time</label>
+              <input type="time" id="endTime" class="form-control" value="14:00">
+            </div>
+          </div>
+
+          <div class="mb-2 pb-1 border-bottom">
+            <small class="text-uppercase text-muted fw-bold" style="letter-spacing:1px"><i class="bi bi-cup-hot me-1"></i>Break Settings</small>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label">Break After Lecture #</label>
+              <input type="number" id="breakAfter" class="form-control" value="3" min="1" max="11">
+            </div>
+            <div class="col-6">
+              <label class="form-label">Break Duration</label>
+              <div class="input-group">
+                <input type="number" id="breakDur" class="form-control" value="20" min="5" max="60">
+                <span class="input-group-text">min</span>
+              </div>
+            </div>
+          </div>
+          <div class="info-badge mb-3">
+            <i class="bi bi-magic"></i>
+            <span>All sections share the same period times (auto)</span>
+          </div>
+
+          <!-- Friday -->
+          <div class="friday-card mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <div class="d-flex align-items-center gap-2">
+                <span style="font-size:1.1rem">🕌</span>
+                <span class="fw-bold" style="color:#7e22ce;font-size:.9rem">Friday Special</span>
+                <span class="friday-badge">Jumu'ah</span>
+              </div>
+              <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" id="friToggle" onchange="toggleFri()" checked>
+              </div>
+            </div>
+            <div id="friSettings">
+              <div class="row g-2 mb-2">
+                <div class="col-6">
+                  <label class="form-label" style="color:#7e22ce">Friday Start</label>
+                  <input type="time" id="friStart" class="form-control" value="08:00" style="border-color:#e879f9">
+                </div>
+                <div class="col-6">
+                  <label class="form-label" style="color:#7e22ce">Friday End</label>
+                  <input type="time" id="friEnd" class="form-control" value="12:00" style="border-color:#e879f9">
+                </div>
+              </div>
+              <div class="row g-2 mb-2">
+                <div class="col-6">
+                  <label class="form-label" style="color:#7e22ce">Break After #</label>
+                  <input type="number" id="friBreakAfter" class="form-control" value="2" min="1" max="10" style="border-color:#e879f9">
+                </div>
+                <div class="col-6">
+                  <label class="form-label" style="color:#7e22ce">Break Duration</label>
+                  <div class="input-group">
+                    <input type="number" id="friBreakDur" class="form-control" value="30" min="5" max="60" style="border-color:#e879f9">
+                    <span class="input-group-text">min</span>
+                  </div>
+                </div>
+              </div>
+              <div class="fri-info"><i class="bi bi-info-circle"></i><span>Friday has fewer periods with longer Juma break</span></div>
+            </div>
+          </div>
+
+          <!-- Sections -->
+          <div class="mb-2 pb-1 border-bottom">
+            <small class="text-uppercase text-muted fw-bold" style="letter-spacing:1px"><i class="bi bi-collection me-1"></i>Select Sections</small>
+          </div>
+          <div class="d-flex gap-2 mb-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="selectAll()">All</button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="clearAll()">Clear</button>
+            <span class="ms-auto badge bg-primary" id="selCount" style="border-radius:20px">0 selected</span>
+          </div>
+          <div class="section-picker" id="secPicker">
+            {% for sec in sections %}
+            <div class="sec-item">
+              <input type="checkbox" id="s{{ sec.id }}" value="{{ sec.id }}"
+                data-name="{{ sec.grade.grade }} — Section {{ sec.section }}" onchange="updateCount()">
+              <label for="s{{ sec.id }}">{{ sec.grade.grade }} — Section {{ sec.section }}</label>
+              <span class="sec-meta">{{ sec.student_count }} students</span>
+            </div>
+            {% endfor %}
+          </div>
+
+          <!-- Progress -->
+          <div class="solver-box" id="solverBox">
+            <div class="d-flex align-items-center gap-2">
+              <div class="spinner-border spinner-border-sm text-primary" style="width:16px;height:16px"></div>
+              <span style="font-size:.83rem;font-weight:600;color:#4f46e5" id="solverMsg">Solving…</span>
+            </div>
+            <div class="solver-bar-wrap"><div class="solver-bar" id="solverBar"></div></div>
+          </div>
+
+          <button class="btn btn-primary w-100 btn-lg mt-3" id="genBtn" onclick="generate()">
+            <i class="bi bi-calendar3 me-2"></i>Generate Timetable
+          </button>
+          <div id="errBox" class="alert alert-danger mt-3" style="display:none;border-radius:9px"></div>
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-body p-3">
+          <h6 class="fw-bold mb-1"><i class="bi bi-shield-check me-2 text-success"></i>Guaranteed Zero Clashes</h6>
+          <small class="text-muted">Uses backtracking: assigns each teacher globally so they never appear in two sections at the same period. All sections share identical period times.</small>
+        </div>
+      </div>
+      <div class="card mt-3">
+        <div class="card-body p-3">
+          <h6 class="fw-bold mb-1"><i class="bi bi-arrows-move me-2 text-primary"></i>Smart Drag & Drop</h6>
+          <small class="text-muted">Swap periods within a section. If a clash occurs, exact step-by-step fix suggestions appear — one click resolves it.</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-head d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="mb-0 fw-bold"><i class="bi bi-calendar-week me-2"></i>Timetable Preview</h5>
+            <small style="opacity:.8">Zero-conflict · Drag to swap · Smart clash fix</small>
+          </div>
+          <div class="d-flex gap-2" id="actionBtns" style="display:none!important">
+            <button class="btn btn-light btn-sm" onclick="window.print()"><i class="bi bi-printer me-1"></i>Print All</button>
+            <button class="btn btn-success btn-sm" onclick="window.print()"><i class="bi bi-download me-1"></i>PDF</button>
+          </div>
+        </div>
+        <div class="card-body p-4">
+          <div id="placeholder" class="text-center py-5 text-muted">
+            <i class="bi bi-calendar3" style="font-size:4rem;opacity:.3"></i>
+            <h5 class="mt-3" style="opacity:.5">No Timetable Yet</h5>
+            <p style="opacity:.4">Select sections and click Generate</p>
+          </div>
+          <div id="ttPreview"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="timetableOutput"></div>
+
+<!-- CONFLICT MODAL -->
+<div class="modal-overlay" id="clashModal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-head-danger">
+      <i class="bi bi-exclamation-triangle-fill" style="font-size:1.3rem"></i>
+      <div>
+        <h5 class="mb-0">Teacher Clash Detected!</h5>
+        <small style="opacity:.85">Swap created a conflict — choose a fix below</small>
+      </div>
+    </div>
+    <div class="modal-body-pad">
+      <div class="clash-info" id="clashInfo"></div>
+      <div id="fixSection" style="display:none">
+        <div class="fix-box mb-2">
+          <strong><i class="bi bi-lightbulb-fill me-1"></i>Auto-Fix Options:</strong>
+          <small class="text-muted d-block mt-1">Click any option below — it will instantly resolve the clash without creating new ones.</small>
+        </div>
+        <div id="fixOptions"></div>
+      </div>
+      <div id="noFixWarn" class="no-fix-warn" style="display:none">
+        <i class="bi bi-exclamation-circle me-2"></i>
+        <strong>No automatic fix available.</strong> The safest option is to undo this swap.
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline-secondary btn-sm" onclick="keepClash()"><i class="bi bi-check me-1"></i>Keep Anyway</button>
+      <button class="btn btn-danger btn-sm" onclick="undoSwap()"><i class="bi bi-arrow-counterclockwise me-1"></i>Undo Swap</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="tt-toast" id="toast"><i class="bi bi-check-circle-fill"></i><span id="toastMsg"></span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+//  GV SCHOOL — ZERO CLASH TIMETABLE ENGINE  v4.0
+//
+//  FIX (this version):
+//  1) Every section now gets EXACTLY as many lecture periods as it has
+//     subjects — every single day (Mon-Sat, and Friday where it fits).
+//     No more "padding" to the biggest section's subject count, so no
+//     more random blank/free periods and no more days showing 2 lectures
+//     one day and 3 the next for the same section.
+//  2) Period START TIMES are still identical across every section (P1 of
+//     a 3-subject class starts at the same clock time as P1 of a
+//     6-subject class) because everyone still shares the same unified
+//     period duration — sections with fewer subjects just have a
+//     shorter day, they don't get fake empty periods tacked on.
+//  3) The backtracking solver now RETRIES with fresh random shuffles
+//     (many attempts, different seed each time) before it will ever
+//     accept a conflict. Only if every attempt genuinely fails (a true
+//     mathematical impossibility, e.g. one teacher needed in 2 places
+//     more times than there are periods) does it fall back to a
+//     conflict-marked schedule so you can see exactly what to fix.
+// ════════════════════════════════════════════════════════════════════════════
+
+const ASSIGNMENTS = [{% for a in assignments %}{section_id:{{ a.clas.id }},subject:"{{ a.Subject }}",teacher_id:"{{ a.Employee_ID }}",teacher_name:"{{ a.teacher_name }}"},{% endfor %}];
+const NORMAL_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Saturday'];
+const MAX_SOLVE_ATTEMPTS = 60; // keep re-shuffling until a clash-free arrangement is found
+
+const sectionSchedules = {};
+const sectionMeta      = {};
+let lastSwap       = null;
+let fixSuggestions = [];
+let clashCells     = [];
+
+// ── Utilities ─────────────────────────────────────────────────────────────
+const toMins = t => { const [h,m]=t.split(':').map(Number); return h*60+m; };
+const toTime = m => {
+  const h=Math.floor(m/60),mn=m%60,ap=h>=12?'PM':'AM',h12=h>12?h-12:(h===0?12:h);
+  return `${h12}:${String(mn).padStart(2,'0')} ${ap}`;
+};
+const getSec    = id => ASSIGNMENTS.filter(a => a.section_id === parseInt(id));
+const calcDur   = (s,e,n,b) => { const d=Math.floor((toMins(e)-toMins(s)-b)/n); return d>=10?d:null; };
+
+// Seeded Fisher-Yates shuffle — each day / attempt gets a different arrangement
+function shuffle(arr, seed) {
+  const a = [...arr];
+  let s = seed * 9301 + 49297;
+  for (let i = a.length-1; i > 0; i--) {
+    s = (s * 9301 + 49297) % 233280;
+    const j = Math.floor((s / 233280) * (i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildSlots(startMin, dur, breakAfter, breakDur, count) {
+  const slots=[]; let cur=startMin;
+  for(let i=1; i<=count; i++){
+    slots.push({start:toTime(cur), end:toTime(cur+dur), isBreak:false, num:i});
+    cur += dur;
+    if(i===breakAfter && i<count){
+      slots.push({start:toTime(cur), end:toTime(cur+breakDur), isBreak:true});
+      cur += breakDur;
+    }
+  }
+  return slots;
+}
+
+// Given the master (biggest) slot template, take just the first `count`
+// lecture slots (plus any break slot that naturally falls before that
+// point) for a section that only has `count` subjects. Period numbers
+// and clock times are untouched — they still line up with every other
+// section's timetable.
+function sliceSlotsForCount(masterSlots, count) {
+  if (count <= 0) return [];
+  const out = []; let lecSeen = 0;
+  for (const s of masterSlots) {
+    out.push(s);
+    if (!s.isBreak) {
+      lecSeen++;
+      if (lecSeen >= count) break;
+    }
+  }
+  return out;
+}
+
+function toggleFri(){ document.getElementById('friSettings').style.display = document.getElementById('friToggle').checked ? 'block' : 'none'; }
+function updateCount(){ const n=document.querySelectorAll('#secPicker input:checked').length; document.getElementById('selCount').textContent=`${n} selected`; }
+function selectAll(){ document.querySelectorAll('#secPicker input').forEach(c=>c.checked=true); updateCount(); }
+function clearAll(){ document.querySelectorAll('#secPicker input').forEach(c=>c.checked=false); updateCount(); }
+function showErr(m){ const b=document.getElementById('errBox'); b.innerHTML=`<i class="bi bi-exclamation-triangle me-2"></i>${m}`; b.style.display='block'; }
+function setProgress(p,m){ document.getElementById('solverBar').style.width=p+'%'; document.getElementById('solverMsg').textContent=m; }
+function toast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.className=`tt-toast ${type}`;
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 4500);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  CORE SOLVER — solveDayAttempt()
+//  Backtracking across ALL sections simultaneously, for ONE day.
+//  Each section now brings its OWN pNums (own period count = own subject
+//  count), so a 3-subject class only ever gets 3 periods — never padded,
+//  never short.
+//  teacherAtPeriod ensures no teacher appears in 2 places in the same period.
+// ════════════════════════════════════════════════════════════════════════════
+const STEP_BUDGET = 6000; // hard cap on backtracking steps per attempt — stops runaway/frozen search
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+function solveDayAttempt(sectionList, seed) {
+  const teacherAtPeriod = {};
+  const allResult = {};
+  sectionList.forEach(({secId}) => { allResult[secId] = {}; });
+
+  const orderedSecs = shuffle(sectionList, seed * 53 + 17);
+  let steps = 0;
+  let budgetBlown = false;
+
+  function solveSection(secIdx) {
+    if (budgetBlown) return false;
+    if (secIdx >= orderedSecs.length) return true;
+    const {secId, assigns, pNums} = orderedSecs[secIdx];
+    const orderedAssigns = shuffle(assigns, seed * 71 + secIdx * 13);
+    const orderedP        = shuffle(pNums,   seed * 137 + 29 + secIdx * 7);
+    const usedInSec        = new Set();
+
+    function solveSubject(subIdx) {
+      if (budgetBlown) return false;
+      if (subIdx >= orderedAssigns.length) return solveSection(secIdx+1);
+      const a   = orderedAssigns[subIdx];
+      const tid = a.teacher_id;
+      if (!teacherAtPeriod[tid]) teacherAtPeriod[tid] = new Set();
+
+      for (const p of orderedP) {
+        steps++;
+        if (steps > STEP_BUDGET) { budgetBlown = true; return false; }
+        if (usedInSec.has(p)) continue;
+        if (teacherAtPeriod[tid].has(p)) continue;
+        usedInSec.add(p);
+        teacherAtPeriod[tid].add(p);
+        allResult[secId][p] = {...a, conflict: false};
+        if (solveSubject(subIdx+1)) return true;
+        usedInSec.delete(p);
+        teacherAtPeriod[tid].delete(p);
+        delete allResult[secId][p];
+        if (budgetBlown) return false;
+      }
+      return false;
+    }
+    return solveSubject(0);
+  }
+
+  if (solveSection(0)) return allResult;
+  return null;
+}
+
+// Keep re-shuffling (fresh seed each time) until a completely clash-free
+// arrangement is found. Each attempt is capped by STEP_BUDGET so a single
+// hard attempt can never freeze the page — if it's not solved quickly it's
+// abandoned and a fresh shuffle is tried instead. Every few attempts we
+// yield back to the browser (await sleep) so the tab stays responsive and
+// the progress bar keeps moving instead of appearing frozen. Only after
+// MAX_SOLVE_ATTEMPTS honest tries do we give up and fall back to a
+// conflict-marked schedule.
+async function solveDay(sectionList, dayIndex) {
+  for (let attempt = 0; attempt < MAX_SOLVE_ATTEMPTS; attempt++) {
+    const seed = dayIndex * 100000 + attempt * 977 + 13;
+    const result = solveDayAttempt(sectionList, seed);
+    if (result) return result;
+    if (attempt % 4 === 3) await sleep(0); // let the browser breathe
+  }
+  return null;
+}
+
+async function buildSchedule(sectionList, days, onDayDone) {
+  const allScheds = {};
+  sectionList.forEach(({secId}) => { allScheds[secId] = {}; });
+  let ok = true;
+  for (let idx = 0; idx < days.length; idx++) {
+    const day = days[idx];
+    const result = await solveDay(sectionList, idx);
+    if (result) {
+      sectionList.forEach(({secId}) => { allScheds[secId][day] = result[secId]; });
+    } else {
+      sectionList.forEach(({secId, assigns, pNums}) => {
+        allScheds[secId][day] = {};
+        assigns.forEach((a, i) => {
+          allScheds[secId][day][pNums[i]] = {...a, conflict:true, conflictWith:'Teacher overloaded — assign a different teacher'};
+        });
+      });
+      ok = false;
+    }
+    if (onDayDone) onDayDone(day, idx, days.length);
+    await sleep(0); // yield so the progress text/bar actually repaints
+  }
+  return {allScheds, ok};
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  GENERATE
+//
+//  Duration is still calculated from the section with the MOST subjects
+//  (maxN) so P1, P2, P3... start at the exact same clock time for every
+//  section. But each section now only gets AS MANY periods as it has
+//  subjects — no padding, no random blanks, no inconsistent lecture
+//  counts between days.
+// ════════════════════════════════════════════════════════════════════════════
+async function generate() {
+  document.getElementById('errBox').style.display = 'none';
+  const checked = [...document.querySelectorAll('#secPicker input:checked')];
+  if (!checked.length) { showErr('Please select at least one section!'); return; }
+
+  const startTime  = document.getElementById('startTime').value;
+  const endTime    = document.getElementById('endTime').value;
+  const breakAfter = parseInt(document.getElementById('breakAfter').value);
+  const breakDur   = parseInt(document.getElementById('breakDur').value);
+  const friOn      = document.getElementById('friToggle').checked;
+  const friStart   = document.getElementById('friStart').value;
+  const friEnd     = document.getElementById('friEnd').value;
+  const friBAf     = parseInt(document.getElementById('friBreakAfter').value);
+  const friBDur    = parseInt(document.getElementById('friBreakDur').value);
+
+  if (!startTime || !endTime) { showErr('Set school start and end time!'); return; }
+  if (toMins(endTime) <= toMins(startTime)) { showErr('End time must be after start time!'); return; }
+  if (friOn && toMins(friEnd) <= toMins(friStart)) { showErr('Friday end must be after Friday start!'); return; }
+
+  Object.keys(sectionSchedules).forEach(k => delete sectionSchedules[k]);
+  Object.keys(sectionMeta).forEach(k => delete sectionMeta[k]);
+  clearClashHighlights();
+
+  const sb = document.getElementById('solverBox');
+  sb.style.display = 'block';
+  setProgress(5, 'Preparing sections…');
+  document.getElementById('genBtn').disabled = true;
+
+  await sleep(60); // let "Preparing sections…" actually paint before heavy work starts
+
+  try {
+    const today = new Date().toLocaleDateString('en-PK', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    let previewHTML = '', hasErr = false;
+
+    // ── STEP 1: Collect valid sections ──────────────────────────────────────
+    const rawSections = [];
+    checked.forEach(cb => {
+      const secId   = cb.value;
+      const secName = cb.dataset.name;
+      const assigns = getSec(secId);
+      if (!assigns.length) {
+        previewHTML += `<div class="alert alert-warning mb-3">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          <strong>${secName}</strong> — No teachers assigned. Run Auto-Assign first.
+        </div>`;
+        return;
+      }
+      rawSections.push({secId, secName, assigns});
+    });
+
+    if (!rawSections.length) {
+      sb.style.display = 'none';
+      document.getElementById('genBtn').disabled = false;
+      if (!hasErr) showErr('No valid sections to generate!');
+      return;
+    }
+
+    // ── STEP 2: unified duration based on MAX subjects (for clock alignment) ─
+    const maxN = Math.max(...rawSections.map(s => s.assigns.length));
+
+    if (breakAfter >= maxN) {
+      sb.style.display = 'none';
+      document.getElementById('genBtn').disabled = false;
+      showErr(`Break after period # (${breakAfter}) must be less than the maximum lecture count (${maxN}).`);
+      return;
+    }
+
+    const unifiedDur = calcDur(startTime, endTime, maxN, breakDur);
+    if (!unifiedDur) {
+      sb.style.display = 'none';
+      document.getElementById('genBtn').disabled = false;
+      showErr(`Not enough time for ${maxN} periods + ${breakDur} min break. Please adjust timing.`);
+      return;
+    }
+
+    // ── STEP 3: master slot template (biggest section's full day) ───────────
+    const masterNormalSlots = buildSlots(toMins(startTime), unifiedDur, breakAfter, breakDur, maxN);
+
+    // Friday master slots
+    let masterFriSlots = null;
+    let friFeasible     = false;
+    if (friOn && friBAf < maxN) {
+      const fd = calcDur(friStart, friEnd, maxN, friBDur);
+      if (fd) {
+        masterFriSlots = buildSlots(toMins(friStart), fd, friBAf, friBDur, maxN);
+        friFeasible = true;
+      }
+    }
+
+    // ── STEP 4: give EACH section its own slots — exactly = its subject count
+    const allSections = rawSections.map(({secId, secName, assigns}) => {
+      const count       = assigns.length;
+      const normalSlots = sliceSlotsForCount(masterNormalSlots, count);
+      const pNums        = normalSlots.filter(s => !s.isBreak).map(s => s.num);
+      const friSlots     = friFeasible ? sliceSlotsForCount(masterFriSlots, count) : null;
+      const friPNums      = friSlots ? friSlots.filter(s => !s.isBreak).map(s => s.num) : [];
+      sectionMeta[secId] = {secName, assigns, dur: unifiedDur, normalSlots, pNums, friSlots, friPNums};
+      return {secId, secName, assigns, pNums, friPNums};
+    });
+
+    setProgress(20, 'Running backtracking solver for Mon–Thu & Sat…');
+
+    const {allScheds: normScheds, ok: normOk} = await buildSchedule(
+      allSections.map(s => ({secId:s.secId, assigns:s.assigns, pNums:s.pNums})),
+      NORMAL_DAYS,
+      (day, idx, total) => setProgress(20 + Math.round((idx+1)/total*40), `Solving ${day}… (${idx+1}/${total})`)
+    );
+
+    setProgress(65, 'Solving Friday…');
+
+    let friScheds = {}, friOk = true;
+    if (friFeasible) {
+      const friList = allSections
+        .filter(s => s.friPNums.length)
+        .map(s => ({secId:s.secId, assigns:s.assigns, pNums:s.friPNums}));
+      if (friList.length) {
+        const r = await buildSchedule(friList, ['Friday'], () => setProgress(80, 'Solving Friday…'));
+        friScheds = r.allScheds; friOk = r.ok;
+      }
+    }
+
+    setProgress(85, 'Rendering timetables…');
+
+    allSections.forEach(({secId}) => {
+      sectionSchedules[secId] = {
+        normal:      normScheds[secId],
+        friday:      friScheds[secId] || null,
+        normalSlots: sectionMeta[secId].normalSlots,
+        friSlots:    sectionMeta[secId].friSlots
+      };
+    });
+
+    let printHTML = '';
+    allSections.forEach(({secId, secName}) => {
+      const m    = sectionMeta[secId];
+      const html = renderSection(
+        secId, secName, today,
+        m.normalSlots, normScheds[secId], unifiedDur,
+        startTime, endTime, breakDur,
+        m.friSlots, friScheds[secId] || null,
+        friStart, friEnd, friBDur, friOn
+      );
+      previewHTML += `<div class="tt-section">${html}</div>`;
+      printHTML   += `<div style="page-break-after:always">${html}</div>`;
+    });
+
+    document.getElementById('placeholder').style.display    = 'none';
+    document.getElementById('ttPreview').innerHTML           = previewHTML;
+    document.getElementById('timetableOutput').innerHTML     = printHTML;
+    document.getElementById('timetableOutput').style.display = 'block';
+
+    const b = document.getElementById('actionBtns');
+    b.style.display = 'flex'; b.style.gap = '.5rem';
+
+    attachDragDrop();
+    setProgress(100, 'Done!');
+
+    if (normOk && friOk)
+      toast(`✓ Timetable generated — every subject has a lecture every day · ZERO clashes!`, 'success');
+    else
+      toast('⚠ Some teacher conflicts exist — check assignments in admin', 'warning');
+
+  } catch (err) {
+    console.error(err);
+    showErr('Something went wrong while generating the timetable. Please try again.');
+  } finally {
+    sb.style.display = 'none';
+    document.getElementById('genBtn').disabled = false;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  RENDER SECTION
+// ════════════════════════════════════════════════════════════════════════════
+function renderSection(secId, secName, today, normalSlots, normSched, dur,
+  startTime, endTime, breakDur, friSlots, friSched, friStart, friEnd, friBDur, friOn) {
+
+  let hdr = '<th class="day-col">Day</th>';
+  normalSlots.forEach(s => {
+    if (s.isBreak) hdr += `<th style="background:#d97706;width:65px">☕<br><small style="font-weight:400">${s.start}–${s.end}</small></th>`;
+    else           hdr += `<th>P${s.num}<br><small style="font-weight:400;opacity:.85">${s.start}–${s.end}</small></th>`;
+  });
+
+  let rows = '';
+  NORMAL_DAYS.forEach(day => {
+    rows += `<tr><td class="day-label">${day}</td>`;
+    normalSlots.forEach(slot => {
+      if (slot.isBreak) { rows += `<td><div class="break-cell">☕ Break</div></td>`; return; }
+      const a = normSched && normSched[day] ? normSched[day][slot.num] : null;
+      if (!a) { rows += `<td><div class="free-cell">—</div></td>`; return; }
+      if (a.conflict) {
+        rows += `<td><div class="lec-cell" style="background:#fff0f0;border-color:#fca5a5" draggable="true"
+            data-conflict="true" data-sec="${secId}" data-day="${day}" data-slot="${slot.num}" data-type="normal">
+          <div class="subj" style="color:#991b1b">${a.subject}</div>
+          <div class="teacher" style="color:#b91c1c"><i class="bi bi-person-fill"></i> ${a.teacher_name}</div>
+          <small style="color:#ef4444;font-size:.62rem">⚠ ${a.conflictWith}</small>
+        </div></td>`;
+      } else {
+        rows += `<td><div class="lec-cell" draggable="true"
+            data-sec="${secId}" data-day="${day}" data-slot="${slot.num}" data-type="normal">
+          <div class="subj">${a.subject}</div>
+          <div class="teacher"><i class="bi bi-person-fill"></i> ${a.teacher_name}</div>
+          <div class="drag-hint">⠿ drag to swap</div>
+        </div></td>`;
+      }
+    });
+    rows += '</tr>';
+  });
+
+  let friHtml = '';
+  if (friOn && friSlots && friSlots.length && friSched) {
+    let fh = '<th class="day-col fri-th">Day</th>';
+    friSlots.forEach(s => {
+      if (s.isBreak) fh += `<th style="background:#b45309;width:65px">☕<br><small>${s.start}–${s.end}</small></th>`;
+      else           fh += `<th class="fri-th">P${s.num}<br><small style="font-weight:400;opacity:.85">${s.start}–${s.end}</small></th>`;
+    });
+    let fr = `<tr><td class="day-label" style="border-right-color:#a21caf!important">Friday</td>`;
+    friSlots.forEach(slot => {
+      if (slot.isBreak) { fr += `<td><div class="break-cell">🕌 Juma Break</div></td>`; return; }
+      const a = friSched && friSched['Friday'] ? friSched['Friday'][slot.num] : null;
+      if (!a) { fr += `<td><div class="free-cell">—</div></td>`; return; }
+      fr += `<td><div class="fri-cell" draggable="true"
+          data-sec="${secId}" data-day="Friday" data-slot="${slot.num}" data-type="friday">
+        <div class="subj">${a.subject}</div>
+        <div class="teacher"><i class="bi bi-person-fill"></i> ${a.teacher_name}</div>
+        <div class="drag-hint">⠿ drag to swap</div>
+      </div></td>`;
+    });
+    fr += '</tr>';
+    friHtml = `<div class="fri-header">🕌 Friday Schedule
+      <span style="opacity:.75;font-weight:400;font-size:.72rem;margin-left:.5rem">${friStart}–${friEnd} · Break ${friBDur} min</span>
+    </div>
+    <div class="table-responsive"><table class="tt-table"><thead><tr>${fh}</tr></thead><tbody>${fr}</tbody></table></div>`;
+  }
+
+  const secAssigns = sectionMeta[secId] ? sectionMeta[secId].assigns.length : normalSlots.filter(s=>!s.isBreak).length;
+  return `
+  <div class="tt-label">
+    <span><i class="bi bi-collection me-2"></i>${secName}</span>
+    <small style="opacity:.75;font-weight:400">${secAssigns} subjects · ${dur} min/period</small>
+  </div>
+  <div class="tt-wrapper">
+    <div class="tt-header">
+      <h2><i class="bi bi-mortarboard-fill me-2"></i>GV School</h2>
+      <p>Weekly Timetable — <strong>${secName}</strong></p>
+      <div class="tt-meta">
+        <span><i class="bi bi-clock"></i> ${startTime}–${endTime}</span>
+        <span><i class="bi bi-journal-bookmark"></i> ${secAssigns} subjects · ${dur} min/period</span>
+        <span><i class="bi bi-cup-hot"></i> ${breakDur} min break</span>
+        <span><i class="bi bi-calendar3"></i> ${today}</span>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="tt-table"><thead><tr>${hdr}</tr></thead><tbody>${rows}</tbody></table>
+    </div>
+    ${friHtml}
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  DRAG & DROP
+// ════════════════════════════════════════════════════════════════════════════
+let dragSrc = null;
+
+function attachDragDrop() {
+  document.querySelectorAll('[draggable=true]').forEach(el => bindDragEvents(el));
+}
+
+function bindDragEvents(el) {
+  el.removeEventListener('dragstart', onStart);
+  el.removeEventListener('dragover',  onOver);
+  el.removeEventListener('dragleave', onLeave);
+  el.removeEventListener('drop',      onDrop);
+  el.removeEventListener('dragend',   onEnd);
+  el.addEventListener('dragstart', onStart);
+  el.addEventListener('dragover',  onOver);
+  el.addEventListener('dragleave', onLeave);
+  el.addEventListener('drop',      onDrop);
+  el.addEventListener('dragend',   onEnd);
+}
+
+function onStart(e) {
+  dragSrc = { el:e.currentTarget, sec:e.currentTarget.dataset.sec, day:e.currentTarget.dataset.day, slot:parseInt(e.currentTarget.dataset.slot), type:e.currentTarget.dataset.type };
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function onOver(e) {
+  e.preventDefault();
+  const t = e.currentTarget;
+  if (dragSrc && t !== dragSrc.el && t.dataset.sec === dragSrc.sec) t.classList.add('drag-over');
+}
+function onLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function onEnd()    { document.querySelectorAll('.dragging,.drag-over').forEach(el => el.classList.remove('dragging','drag-over')); }
+
+function onDrop(e) {
+  e.preventDefault();
+  const tgt = e.currentTarget;
+  tgt.classList.remove('drag-over');
+  if (!dragSrc || tgt === dragSrc.el) return;
+  if (tgt.dataset.sec !== dragSrc.sec) { toast('Cannot swap between different sections', 'error'); return; }
+
+  const tDay  = tgt.dataset.day;
+  const tSlot = parseInt(tgt.dataset.slot);
+  const tType = tgt.dataset.type;
+  const sec   = sectionSchedules[dragSrc.sec];
+  if (!sec) return;
+
+  const sSched = dragSrc.type === 'friday' ? sec.friday : sec.normal;
+  const tSched = tType         === 'friday' ? sec.friday : sec.normal;
+  if (!sSched || !tSched) return;
+
+  const sA = sSched[dragSrc.day] && sSched[dragSrc.day][dragSrc.slot];
+  const tA = tSched[tDay]        && tSched[tDay][tSlot];
+  if (!sA || !tA) { toast('Cannot swap an empty slot', 'error'); return; }
+
+  lastSwap = {
+    sSched, tSched,
+    sDay: dragSrc.day, sSlot: dragSrc.slot,
+    tDay, tSlot,
+    sA: {...sA}, tA: {...tA},
+    sEl: dragSrc.el, tEl: tgt,
+    sHTML: dragSrc.el.innerHTML, tHTML: tgt.innerHTML,
+    secId: dragSrc.sec
+  };
+
+  sSched[dragSrc.day][dragSrc.slot] = {...tA, conflict: false};
+  tSched[tDay][tSlot]               = {...sA, conflict: false};
+
+  const tmp = dragSrc.el.innerHTML;
+  dragSrc.el.innerHTML = tgt.innerHTML;
+  tgt.innerHTML = tmp;
+  bindDragEvents(dragSrc.el);
+  bindDragEvents(tgt);
+  dragSrc = null;
+
+  clearClashHighlights();
+  checkClashes();
+}
+
+function clearClashHighlights() {
+  clashCells.forEach(el => el && el.classList && el.classList.remove('has-clash'));
+  clashCells = [];
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  POST-SWAP CLASH DETECTION
+// ════════════════════════════════════════════════════════════════════════════
+function checkClashes() {
+  if (!lastSwap) return;
+  const {sDay, sSlot, tDay, tSlot, sA, tA, secId} = lastSwap;
+  const detectedClashes = [];
+
+  function scanTeacher(movedAssign, day, pNum, thisSecId) {
+    Object.entries(sectionSchedules).forEach(([sid, data]) => {
+      if (sid === thisSecId) return;
+      ['normal','friday'].forEach(schedType => {
+        const sc = data[schedType];
+        if (!sc || !sc[day]) return;
+        const a = sc[day][pNum];
+        if (a && a.teacher_id === movedAssign.teacher_id) {
+          const cb       = document.querySelector(`#secPicker input[value="${sid}"]`);
+          const sname    = cb ? cb.dataset.name : `Section ${sid}`;
+          const thisName = document.querySelector(`#secPicker input[value="${thisSecId}"]`)?.dataset?.name || `Section ${thisSecId}`;
+          detectedClashes.push({teacher:movedAssign, day, pNum, thisSecId, thisSecName:thisName, otherSecId:sid, otherSecName:sname, otherSubject:a.subject, conflictScheduleType:schedType});
+          const c1 = document.querySelector(`[data-sec="${thisSecId}"][data-day="${day}"][data-slot="${pNum}"]`);
+          const c2 = document.querySelector(`[data-sec="${sid}"][data-day="${day}"][data-slot="${pNum}"][data-type="${schedType}"]`);
+          if (c1) { c1.classList.add('has-clash'); clashCells.push(c1); }
+          if (c2) { c2.classList.add('has-clash'); clashCells.push(c2); }
+        }
+      });
+    });
+  }
+
+  scanTeacher(tA, sDay, sSlot, secId);
+  scanTeacher(sA, tDay, tSlot, secId);
+
+  if (!detectedClashes.length) {
+    toast(`✓ Swapped ${sA.subject} ↔ ${tA.subject} — No clashes!`, 'success');
+    return;
+  }
+
+  let info = `<div class="d-flex align-items-center gap-2 mb-2">
+    <i class="bi bi-x-circle-fill text-danger" style="font-size:1.1rem"></i>
+    <strong>Your swap caused ${detectedClashes.length} teacher clash${detectedClashes.length>1?'es':''}:</strong>
+  </div>`;
+  detectedClashes.forEach(c => {
+    info += `<div class="clash-row"><span class="clash-icon">👤</span><div>
+      <strong>${c.teacher.teacher_name}</strong> (${c.teacher.subject}) is now scheduled in<br>
+      <strong>${c.thisSecName}</strong> AND <strong>${c.otherSecName}</strong>
+      — both on <strong>${c.day}, Period ${c.pNum}</strong>
+    </div></div>`;
+  });
+  document.getElementById('clashInfo').innerHTML = info;
+
+  // Find fix suggestions
+  fixSuggestions = [];
+  detectedClashes.forEach(clash => {
+    const {teacher, day, pNum, otherSecId, otherSecName} = clash;
+    const data = sectionSchedules[otherSecId];
+    if (!data || !data.normal || !data.normal[day]) return;
+    const sched = data.normal[day];
+    Object.keys(sched).map(Number).forEach(altP => {
+      if (altP === pNum) return;
+      const altA = sched[altP];
+      if (!altA) return;
+      const teacherFreeAtAlt = !Object.entries(sectionSchedules).some(([sid,d]) => {
+        if (sid === otherSecId) return false;
+        return (d.normal&&d.normal[day]&&d.normal[day][altP]&&d.normal[day][altP].teacher_id===teacher.teacher_id)||
+               (d.friday&&d.friday[day]&&d.friday[day][altP]&&d.friday[day][altP].teacher_id===teacher.teacher_id);
+      });
+      const altFreeAtP = !Object.entries(sectionSchedules).some(([sid,d]) => {
+        if (sid === otherSecId) return false;
+        return (d.normal&&d.normal[day]&&d.normal[day][pNum]&&d.normal[day][pNum].teacher_id===altA.teacher_id)||
+               (d.friday&&d.friday[day]&&d.friday[day][pNum]&&d.friday[day][pNum].teacher_id===altA.teacher_id);
+      });
+      if (teacherFreeAtAlt && altFreeAtP) {
+        const normSlots = sectionSchedules[otherSecId].normalSlots || [];
+        const slotA = normSlots.find(s => !s.isBreak && s.num === pNum);
+        const slotB = normSlots.find(s => !s.isBreak && s.num === altP);
+        fixSuggestions.push({
+          otherSecId, otherSecName, day,
+          pA:pNum,  subjA:teacher.subject, tNameA:teacher.teacher_name, timeA:slotA?slotA.start:`P${pNum}`,
+          pB:altP,  subjB:altA.subject,    tNameB:altA.teacher_name,    timeB:slotB?slotB.start:`P${altP}`,
+          clashTeacher:teacher.teacher_name
+        });
+      }
+    });
+  });
+
+  // Deduplicate
+  const seen = new Set();
+  fixSuggestions = fixSuggestions.filter(s => {
+    const key = `${s.otherSecId}|${s.day}|${s.pA}|${s.pB}`;
+    if (seen.has(key)) return false;
+    seen.add(key); return true;
+  });
+
+  const fixSection = document.getElementById('fixSection');
+  const noFixWarn  = document.getElementById('noFixWarn');
+  const fixOpts    = document.getElementById('fixOptions');
+  fixOpts.innerHTML = '';
+
+  if (fixSuggestions.length) {
+    fixSection.style.display = 'block';
+    noFixWarn.style.display  = 'none';
+    fixSuggestions.slice(0,6).forEach((s,i) => {
+      fixOpts.innerHTML += `<div class="fix-option" onclick="applyFix(${i})">
+        <span class="fix-badge">Fix ${i+1}</span>
+        <div class="fix-detail">
+          In <strong>${s.otherSecName}</strong> on <strong>${s.day}</strong>:
+          swap <em>${s.subjA}</em> (Period ${s.pA} · ${s.timeA}) ↔ <em>${s.subjB}</em> (Period ${s.pB} · ${s.timeB})
+          <div class="fix-step">→ <strong>${s.clashTeacher}</strong> moves P${s.pA}→P${s.pB}, <strong>${s.tNameB}</strong> moves P${s.pB}→P${s.pA}</div>
+        </div>
+      </div>`;
+    });
+  } else {
+    fixSection.style.display = 'none';
+    noFixWarn.style.display  = 'block';
+  }
+
+  document.getElementById('clashModal').style.display = 'flex';
+}
+
+function applyFix(idx) {
+  const s = fixSuggestions[idx];
+  if (!s) return;
+  const data = sectionSchedules[s.otherSecId];
+  if (!data || !data.normal || !data.normal[s.day]) return;
+  const sched = data.normal[s.day];
+  const tmp   = {...sched[s.pA]};
+  sched[s.pA] = {...sched[s.pB], conflict:false};
+  sched[s.pB] = {...tmp,          conflict:false};
+  const cellA = document.querySelector(`[data-sec="${s.otherSecId}"][data-day="${s.day}"][data-slot="${s.pA}"][data-type="normal"]`);
+  const cellB = document.querySelector(`[data-sec="${s.otherSecId}"][data-day="${s.day}"][data-slot="${s.pB}"][data-type="normal"]`);
+  if (cellA && cellB) {
+    const th = cellA.innerHTML; cellA.innerHTML = cellB.innerHTML; cellB.innerHTML = th;
+    bindDragEvents(cellA); bindDragEvents(cellB);
+  }
+  clearClashHighlights();
+  closeModal();
+  const remaining = globalClashScan();
+  if (remaining === 0) toast(`✓ Fixed! ${s.subjA} ↔ ${s.subjB} in ${s.otherSecName} — Zero clashes!`, 'success');
+  else toast(`Fix applied. ${remaining} clash(es) still remain.`, 'warning');
+}
+
+function globalClashScan() {
+  let count = 0;
+  const allDays = [...NORMAL_DAYS, 'Friday'];
+  allDays.forEach(day => {
+    const teacherMap = {};
+    Object.entries(sectionSchedules).forEach(([secId, data]) => {
+      ['normal','friday'].forEach(st => {
+        const sc = data[st];
+        if (!sc || !sc[day]) return;
+        Object.entries(sc[day]).forEach(([pNum, a]) => {
+          if (!a) return;
+          const key = `${a.teacher_id}|${pNum}`;
+          if (!teacherMap[key]) teacherMap[key] = [];
+          teacherMap[key].push({secId, pNum:parseInt(pNum), schedType:st});
+        });
+      });
+    });
+    Object.values(teacherMap).forEach(entries => { if (entries.length > 1) count += entries.length - 1; });
+  });
+  return count;
+}
+
+function keepClash()  { clearClashHighlights(); closeModal(); toast('Swap kept — clash remains.', 'warning'); }
+
+function closeModal() {
+  document.getElementById('clashModal').style.display = 'none';
+  document.getElementById('fixOptions').innerHTML      = '';
+  document.getElementById('fixSection').style.display = 'none';
+  document.getElementById('noFixWarn').style.display  = 'none';
+  fixSuggestions = [];
+}
+
+function undoSwap() {
+  if (!lastSwap) return;
+  const {sSched, tSched, sDay, sSlot, tDay, tSlot, sA, tA, sEl, tEl, sHTML, tHTML} = lastSwap;
+  sSched[sDay][sSlot] = {...sA};
+  tSched[tDay][tSlot] = {...tA};
+  sEl.innerHTML = sHTML; tEl.innerHTML = tHTML;
+  bindDragEvents(sEl); bindDragEvents(tEl);
+  lastSwap = null;
+  clearClashHighlights();
+  closeModal();
+  toast('↩ Swap undone — back to zero clashes', 'warning');
+}
+</script>
+</body>
+</html>

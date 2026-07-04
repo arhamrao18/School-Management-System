@@ -1,0 +1,143 @@
+{% extends 'add/base.html' %}
+{% block content %}
+<div class="container py-4">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center"
+         style="background:linear-gradient(135deg,#d97706,#f59e0b);color:#fff">
+      <span><i class="bi bi-cash-stack me-2"></i>Teacher Salary Management</span>
+      <a href="{% url 'AttendanceHistory' %}" class="btn btn-outline-light btn-sm">
+        <i class="bi bi-clock-history me-1"></i>Attendance History
+      </a>
+    </div>
+
+    <div class="card-body">
+      <!-- Month/Year filter -->
+      <form method="GET" class="row g-2 align-items-end mb-4">
+        <div class="col-6 col-md-3">
+          <label class="form-label fw-semibold">Month</label>
+          <select name="month" class="form-select">
+            {% for num, name in months %}
+            <option value="{{ num }}" {% if sel_month == num %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-6 col-md-2">
+          <label class="form-label fw-semibold">Year</label>
+          <select name="year" class="form-select">
+            {% for y in years %}
+            <option value="{{ y }}" {% if sel_year == y %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 col-md-3">
+          <button type="submit" class="btn btn-warning w-100">
+            <i class="bi bi-search me-1"></i>Filter
+          </button>
+        </div>
+      </form>
+
+      <!-- Deduction Info Box -->
+      <div class="alert" style="background:#fffbeb;border-left:4px solid #f59e0b;border-radius:8px">
+        <h6 class="mb-1"><i class="bi bi-info-circle me-2"></i>Salary Deduction Formula</h6>
+        <small>
+          • 4 days absent: <strong>No deduction</strong><br>
+          • Every extra absent (after 4th): <strong>Base Salary ÷ 26 per day</strong>deduct<br>
+          • <em>Leave days will not count as absent — only absent will count</em>
+        </small>
+      </div>
+
+      <!-- Salary Form -->
+      <form method="POST">
+        {% csrf_token %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead style="background:#4f46e5;color:#fff">
+              <tr>
+                <th>#</th>
+                <th>Teacher</th>
+                <th class="text-center">Absent Days</th>
+                <th>Base Salary (Rs.)</th>
+                <th class="text-center">Deduction</th>
+                <th class="text-center">Net Salary</th>
+                <th class="text-center">Status</th>
+                <th class="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for sal in salary_data %}
+              <tr>
+                <td class="text-muted">{{ forloop.counter }}</td>
+                <td>
+                  <div class="fw-semibold">{{ sal.teacher.First_Name }} {{ sal.teacher.Last_Name }}</div>
+                  <small class="text-muted">{{ sal.teacher.Employee_ID }}</small>
+                </td>
+                <td class="text-center">
+                  {% if sal.absent_days > 4 %}
+                    <span class="badge bg-danger">{{ sal.absent_days }} days</span>
+                    <br><small class="text-danger">+{{ sal.absent_days|add:"-4" }} extra</small>
+                  {% else %}
+                    <span class="badge bg-secondary">{{ sal.absent_days }} days</span>
+                  {% endif %}
+                </td>
+                <td style="min-width:140px">
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text">Rs.</span>
+                    <input type="number" name="base_{{ sal.teacher.id }}"
+                           class="form-control" step="100" min="0"
+                           value="{{ sal.base_salary|default:'' }}"
+                           placeholder="Enter salary">
+                  </div>
+                </td>
+                <td class="text-center">
+                  {% if sal.deduction > 0 %}
+                    <span class="text-danger fw-bold">- Rs. {{ sal.deduction }}</span>
+                  {% else %}
+                    <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  {% if sal.net_salary > 0 %}
+                    <span class="fw-bold text-success">Rs. {{ sal.net_salary }}</span>
+                  {% else %}
+                    <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  {% if sal.is_paid %}
+                    <span class="badge bg-success"><i class="bi bi-check2 me-1"></i>Paid</span>
+                  {% else %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  {% if not sal.is_paid and sal.net_salary > 0 %}
+                    <a href="{% url 'MarkPaid' sal.id %}?month={{ sel_month }}&year={{ sel_year }}"
+                       class="btn btn-sm btn-success"
+                       onclick="return confirm('Salary paid mark karein?')">
+                      <i class="bi bi-check2-circle"></i> Paid
+                    </a>
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="8" class="text-center text-muted py-4">No teacher found.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <small class="text-muted">
+            <i class="bi bi-info-circle me-1"></i>
+            After entering base salaries click "Save Salaries" button. Deduction will come automatically.
+          </small>
+          <button type="submit" class="btn btn-warning btn-lg px-4">
+            <i class="bi bi-save me-2"></i>Save Salaries
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
