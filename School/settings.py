@@ -85,16 +85,16 @@ WSGI_APPLICATION = 'School.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 # import os
 
-if os.environ.get('RENDER'):
-    # Render pe SQLite use karo
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-else:
-    DATABASES = {
+# if os.environ.get('RENDER'):
+#     # Render.com provides a PostgreSQL database by default, but you can also use MySQL or SQLite.
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
+# else:
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'school_system',
