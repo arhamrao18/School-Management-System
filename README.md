@@ -42,7 +42,7 @@ Generates fee vouchers for students, simplifying the fee collection and tracking
 
 ## ⚙️ Installation
 ```bash
-git clone <your-repo-url>
+git clone <https://github.com/arhamrao18/School-Management-System.git>
 cd gv-school
 pip install -r requirements.txt
 python manage.py migrate
